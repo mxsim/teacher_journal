@@ -253,6 +253,8 @@ async function getGroups() {
   });
 }
 
+// folder cmd
+
 // Function to fetch subjects from the database
 async function getSubjects() {
   return new Promise((resolve, reject) => {

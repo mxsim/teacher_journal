@@ -9,6 +9,8 @@ router.get('/', (req, res) => {
   res.render('login'); // Assuming your login page is named 'login.hbs'
 });
 
+// changes to check for folder cmd
+
 // Route handler for processing login data
 router.post('/', (req, res) => {
   const { email, password } = req.body;
