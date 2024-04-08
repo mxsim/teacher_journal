@@ -1,0 +1,39 @@
+{{#if role}}
+  {{#if (eq role "admin")}}
+    <header class="footer-nav" style="background-color: #333;">
+      <nav class="top-nav">
+        <ul>
+          <li><a href="#">Users</a></li>
+          <li><a href="#">Subjects</a></li>
+          <li><a href="#">Groups</a></li>
+          <li><a href="#">Journal</a></li>
+          <li class="logout"><a href="#">Logout</a></li>
+        </ul>
+      </nav>
+    </header>
+  {{else if (eq role "teacher")}}
+    <header class="footer-nav" style="background-color: blue;">
+      <nav class="top-nav">
+        <ul>
+          <li><a href="#">Users</a></li>
+          <li><a href="#">Subjects</a></li>
+          <li><a href="#">Groups</a></li>
+          <li><a href="#">Journal</a></li>
+          <li class="logout"><a href="#">Logout</a></li>
+        </ul>
+      </nav>
+    </header>
+  {{else if (eq role "student")}}
+    <header class="footer-nav" style="background-color: orange;">
+      <nav class="top-nav">
+        <ul>
+          <li><a href="#">Users</a></li>
+          <li><a href="#">Subjects</a></li>
+          <li><a href="#">Groups</a></li>
+          <li><a href="#">Journal</a></li>
+          <li class="logout"><a href="#">Logout</a></li>
+        </ul>
+      </nav>
+    </header>
+  {{/if}}
+{{/if}}

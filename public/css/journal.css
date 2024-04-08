@@ -1,0 +1,112 @@
+
+.main-label {
+    border: thin #000 solid;
+}
+
+/* Container styles */
+.journal-cont-bod {
+    width: 99%;
+    /* Take full width */
+    height: 100vh;
+    background-color: pink;
+    display: flex;
+    justify-content: center;
+    /* Align horizontally to the center */
+    align-items: center;
+    /* Align vertically to the center */
+    padding: 10px;
+
+}
+
+.journal-cont {
+    width: 100%;
+    /* Take full width */
+    height: 100vh;
+    background-color: grey;
+    display: flex;
+    flex-direction: row;
+    /* Align blocks horizontally */
+    justify-content: space-between;
+    align-items: flex-start;
+    /* Align blocks at the top */
+}
+
+.inline-container {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+/* Subject groups styles */
+.subject-groups {
+    background-color: red;
+    width: 15%;
+    height: 96%;
+    margin: 10px;
+}
+
+.subject-group {
+    margin-bottom: 10px;
+}
+
+/* Journal container styles */
+.journal-container {
+    margin: 10px;
+    height: 96%;
+    width: 100px;
+    background-color: aquamarine;
+
+    flex-grow: 1;
+    /* Allow the container to grow and take up available space */
+}
+
+.journal-table {
+    width: 100%;
+    /* Take full width of the journal container */
+    height: 96%;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.journal {
+
+    border-collapse: collapse;
+    width: 100px;
+}
+
+tr {
+    line-height: 100px;
+}
+
+th,
+td {
+    border: 1px solid black;
+    padding: 8px;
+
+}
+
+th.rotate {
+    /* Rotate table headers */
+    transform: rotate(-90deg);
+}
+
+/* Edit button styles */
+.edit-button {
+    margin: 10px;
+    width: 5%;
+
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Grade dates styles */
+.grade-dates {
+    background-color: orange;
+    width: 15%;
+    margin: 10px;
+    height: 96%;
+
+}

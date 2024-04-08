@@ -1,0 +1,4 @@
+// partial error indicates the code cant find hbs files those must be inside imported hbs page, for example if index.hbs has footer or header and ur project doesnt have them, it basically means you either need to remove the elements from the index.hbs or add those files
+
+// might be solution in table 
+UPDATE `journaldb`.`user` SET `password` = 'gghghgh' WHERE (`user_id` = '8');

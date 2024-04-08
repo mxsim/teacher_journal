@@ -1,0 +1,30 @@
+{{!-- student_dashboard.hbs --}}
+<header>
+<nav class="top-nav" style="background-color: #febb00;">
+  <ul>
+    <li><a href="#">Home</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#">Services</a></li>
+    <li><a href="#">Contact</a></li>
+      <li class="logout"><a href="/logout">Logout</a></li> <!-- Update the href attribute -->
+
+  </ul>
+</nav>
+</header>
+
+
+
+<div class="container-body">
+<div>
+    Welcome to the Student Dashboard, {{userData.name}} {{userData.surname}}! {{userData.parent_name}}
+</div>
+</div>
+
+
+
+<footer class="footer-nav" style="background-color: #febb00;">
+  <ul>
+    <li><a href="#">Copyright 2024, All right have served.</a></li>
+
+  </ul>
+</footer>

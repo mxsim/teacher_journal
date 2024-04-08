@@ -1,0 +1,51 @@
+.login-body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    height: 100vh; 
+}
+
+
+.login-container {
+    width: 300px;
+    padding: 20px;
+}
+
+
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-header {
+  text-align: center;
+}
+
+label {
+    margin-bottom: 5px;
+}
+
+input[type="email"],
+input[type="password"] {
+    width: calc(100% - 22px); 
+    padding: 10px;
+    border: none; 
+    border-radius: 5px;
+    background-color: #f0f0f0; 
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    background-color: #e0e0e0; 
+}
+
+.login-button {
+    width: 100%;
+
+}
+

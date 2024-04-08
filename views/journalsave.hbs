@@ -1,0 +1,95 @@
+<!-- journal.hbs -->
+<header>
+  <nav class="top-nav" style="background-color: #007bff;">
+    <ul>
+      <li><a href="/journal">Journal</a></li>
+      <li><a href="#">Groups</a></li>
+      <li><a href="#">Users</a></li>
+      <li class="logout"><a href="/logout">Logout</a></li>
+      <!-- Update the href attribute -->
+    </ul>
+  </nav>
+</header>
+
+<div class="journal-cont-bod">
+  <div class="journal-cont">
+    <!-- Left Block: Subject Groups -->
+    <div class="subject-groups">
+      <h3 class="main-label">Subject Groups</h3>
+      {{#each subjectGroups}}
+        <div class="subject-group">
+          <ul>
+            <li>{{this.subject_name}}
+              <ul>
+                {{#each this.groups}}
+                  <li data-subject-id="{{../subject_id}}" data-group-id="{{this.group_id}}">{{this.group_name}}</li>
+                {{/each}}
+              </ul>
+            </li>
+          </ul>
+        </div>
+      {{/each}}
+    </div>
+
+
+    <!-- Middle Block: Journal Table -->
+    <div class="journal-container">
+      <div class="inline-container">
+        <h3 class="main-label">Subject Groups</h3>
+        <button class="edit-button">Edit</button>
+      </div>
+      <div class="journal-table">
+        <table class="journal">
+          <thead>
+            <tr>
+              <th>Student</th>
+              {{#each dates}}
+                <th class="rotate">{{this}}</th>
+              {{/each}}
+              <!-- Add more date headers dynamically if needed -->
+            </tr>
+          </thead>
+          <tbody>
+            {{#each students}}
+              <tr>
+                <td>{{this.name}}</td>
+                {{#each this.grades}}
+                  <td contenteditable="true">{{this}}</td>
+                {{/each}}
+              </tr>
+            {{/each}}
+            <!-- Add more rows for other students -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Right Block: Grade Dates -->
+    <div class="grade-dates">
+      <h3 class="main-label">Grade Dates</h3>
+      {{#each gradeDates}}
+        <div class="grade-date">
+          <ul>
+            <li>{{this.year}}
+              <ul>
+                {{#each this.months}}
+                  <li>{{this}}</li>
+                {{/each}}
+              </ul>
+            </li>
+          </ul>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
+
+<footer class="footer-nav" style="background-color: #007bff;">
+  <ul>
+    <li><a href="#">Copyright 2024, All rights reserved.</a></li>
+  </ul>
+</footer>
+
+<script>
+
+</script>

@@ -1,0 +1,99 @@
+/* styles.css */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+[class*="container"] {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+[class*="body"] {
+    font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+}
+
+button {
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Top Navigation */
+.top-nav {
+    background-color: #333;
+    overflow: hidden;
+}
+
+.top-nav .logout {
+    float: right;
+    /* Align the logout link to the right */
+}
+
+.top-nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    /* Center-align the navigation links */
+}
+
+.top-nav li {
+    display: inline-block;
+    /* Display list items horizontally */
+}
+
+.top-nav a {
+    display: block;
+    padding: 10px 20px;
+    color: #fff;
+    text-decoration: none;
+}
+
+
+/* Footer Navigation */
+.footer-nav {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    /* Center-align the footer links */
+}
+
+.footer-nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-nav li {
+    display: inline;
+    margin-right: 20px;
+}
+
+.footer-nav a {
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Footer */
+.footer-nav {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}

@@ -1,0 +1,19 @@
+When user opens website, it should show login page (index.hbs with login hbs content). User writes down their information such as email and password, when user clicks on login, it should check if the user wrote their email and password correctly, if not it should display error that the password is incorrect or user with such email does not exist. When user successfully logged in, it should redirect user to dashboard (dashboard depends on the role of logged user, must be defined before redirecting, roles are obvious: admin, teacher, student. The information must be saved in session i suppose to keep track on user data in website) and display header style based on user role too. I hope you understood what i am trying to make.
+
+
+
+
+How can I make:
+1. Redirect user to different hbs file (let's say teacher_group);
+2. Render teacher_group html file content;
+3. Add buttons such as create, delete group;
+4. Make container that will display list with groups and data such as: group name, student leader name, surname, parent name, number of users in the group;
+5. add search bar that will display list of all existing groups in db;
+
+
+
+
+
+current problem:
+- double data output from server side;
+- finally use project for displaying data dynamically;
