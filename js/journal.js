@@ -7,6 +7,8 @@ const connection = require("../config/db"); // Assuming you have a file for data
 router.get("/", async (req, res) => {
   try {
 
+    // hello changes to test in github
+
     // Fetch other data needed for the journal page
     const subjectGroups = await getSubjectGroups();
     const students = await getStudents();
