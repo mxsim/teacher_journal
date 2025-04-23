@@ -258,6 +258,6 @@ INSERT INTO journal (entry_id, student_id, lesson_id, grade) VALUES
 
 -- Insert records into the subject_materials table
 INSERT INTO subject_materials (subject_id, file_name, file_path, material_type) VALUES
-(1, 'algebra.pdf', '/materials/math/algebra.pdf', 'lecture'),
+(1, 'algebra.pdf', 'material_algebra.pdf', 'lecture'),
 (1, 'geometry.pdf', '/materials/math/geometry.pdf', 'lecture'),
 (2, 'mechanics.pdf', '/materials/physics/mechanics.pdf', 'task');

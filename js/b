@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
-const path = require("path");
-const fs = require("fs");
+const path = require("path"); // Added this line
+const fs = require("fs"); // Added this line
 const storageManager = require("../config/multerStorageManager");
 
 // Get the configured upload middleware
@@ -44,24 +44,6 @@ router.get("/", async (req, res) => {
       params = [req.session.userId];
     }
 
-    const [groups] = await db.promise().query(groupsQuery, params);
-
-    // Clean up photo paths and add public URLs
-    const processedGroups = groups.map((group) => {
-      // Ensure we only store filenames in the database
-      const photoFilename = group.subject_group_photo
-        ? storageManager.getFilenameFromPath(group.subject_group_photo)
-        : null;
-
-      return {
-        ...group,
-        subject_group_photo: photoFilename,
-        photoUrl: photoFilename
-          ? storageManager.getPublicUrl("subjectGroupPhotos", photoFilename)
-          : "/img/default-group.jpg",
-      };
-    });
-
     // For teacher users: retrieve subjects for the add/edit forms
     let subjects = [];
     if (req.session.role === "teacher" && teacherId) {
@@ -74,8 +56,18 @@ router.get("/", async (req, res) => {
       subjects = subs;
     }
 
+    const [groups] = await db.promise().query(groupsQuery, params);
+
+    // Clean up photo paths for all groups - return ONLY filenames
+    const cleanedGroups = groups.map(group => ({
+      ...group,
+      subject_group_photo: group.subject_group_photo 
+        ? path.basename(group.subject_group_photo) // This extracts just the filename
+        : null
+    }));
+
     res.render("teacher/subject_groups", {
-      groups: processedGroups,
+      groups: cleanedGroups,
       subjects,
       isTeacher: req.session.role === "teacher",
       user_id: req.session.userId,
@@ -90,12 +82,13 @@ router.get("/", async (req, res) => {
   }
 });
 
+
 // GET single group data for editing
 router.get("/:id", async (req, res) => {
   try {
     const groupId = req.params.id;
     const teacherId = await getTeacherId(req);
-
+    
     const [rows] = await db.promise().query(
       `SELECT sg.*, s.subject_name
        FROM subject_groups sg
@@ -103,17 +96,14 @@ router.get("/:id", async (req, res) => {
        WHERE sg.subject_group_id = ? AND sg.teacher_id = ?`,
       [groupId, teacherId]
     );
-
+    
     if (rows.length === 0) {
       return res.status(404).json({ error: "Group not found" });
     }
 
     const groupData = rows[0];
-    // Ensure we only return the filename
     if (groupData.subject_group_photo) {
-      groupData.subject_group_photo = storageManager.getFilenameFromPath(
-        groupData.subject_group_photo
-      );
+      groupData.subject_group_photo = path.basename(groupData.subject_group_photo);
     }
 
     res.json(groupData);
@@ -124,55 +114,40 @@ router.get("/:id", async (req, res) => {
 });
 
 // Add new group
-router.post(
-  "/add",
-  uploadGroupPhoto.single("group_photo"),
-  async (req, res) => {
-    try {
-      const { "group-name": groupName, subject_id: subjectId } = req.body;
-      const teacherId = await getTeacherId(req);
-      if (!teacherId)
-        return res.status(403).json({ error: "Teacher not found" });
+router.post("/add", uploadGroupPhoto.single("group_photo"), async (req, res) => {
+  try {
+    const { "group-name": groupName, subject_id: subjectId } = req.body;
+    const teacherId = await getTeacherId(req);
+    if (!teacherId) return res.status(403).json({ error: "Teacher not found" });
 
-      // Insert the group (without photo first to get the ID)
-      const [result] = await db.promise().query(
-        `INSERT INTO subject_groups (group_name, subject_id, teacher_id)
+    // Insert the group (without photo first to get the ID)
+    const [result] = await db.promise().query(
+      `INSERT INTO subject_groups (group_name, subject_id, teacher_id)
        VALUES (?, ?, ?)`,
-        [groupName, subjectId, teacherId]
+      [groupName, subjectId, teacherId]
+    );
+    const groupId = result.insertId;
+
+    if (req.file) {
+      const ext = path.extname(req.file.filename);
+      const newFilename = `subj_group_${groupId}${ext}`;
+      const oldPath = storageManager.getFilePath('subjectGroupPhotos', req.file.filename);
+      const newPath = storageManager.getFilePath('subjectGroupPhotos', newFilename);
+      
+      fs.renameSync(oldPath, newPath);
+      
+      await db.promise().query(
+        `UPDATE subject_groups SET subject_group_photo = ? WHERE subject_group_id = ?`,
+        [newFilename, groupId]
       );
-      const groupId = result.insertId;
-
-      if (req.file) {
-        // Generate permanent filename
-        const ext = path.extname(req.file.filename);
-        const newFilename = `subj_group_${groupId}${ext}`;
-
-        // Rename the temp file to permanent name
-        storageManager.renameFile(
-          "subjectGroupPhotos",
-          req.file.filename,
-          newFilename
-        );
-
-        // Update database with just the filename
-        await db
-          .promise()
-          .query(
-            `UPDATE subject_groups SET subject_group_photo = ? WHERE subject_group_id = ?`,
-            [newFilename, groupId]
-          );
-      }
-
-      res.json({ success: true });
-    } catch (err) {
-      console.error("Error adding group:", err);
-      res.status(500).json({
-        error: "Error adding group",
-        details: err.message,
-      });
     }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error adding group:", err);
+    res.status(500).json({ error: "Error adding group" });
   }
-);
+});
 
 // Update group
 router.put("/:id", uploadGroupPhoto.single("group_photo"), async (req, res) => {
@@ -190,20 +165,9 @@ router.put("/:id", uploadGroupPhoto.single("group_photo"), async (req, res) => {
     if (req.file) {
       // Delete old photo if exists
       if (currentPhoto) {
-        storageManager.deleteFile("subjectGroupPhotos", currentPhoto);
+        storageManager.deleteFile('subjectGroupPhotos', currentPhoto);
       }
-      // Generate new filename
-      const ext = path.extname(req.file.filename);
-      const newFilename = `subj_group_${groupId}${ext}`;
-
-      // Rename the uploaded file
-      storageManager.renameFile(
-        "subjectGroupPhotos",
-        req.file.filename,
-        newFilename
-      );
-
-      groupPhoto = newFilename;
+      groupPhoto = req.file.filename;
     }
 
     const [result] = await db.promise().query(
@@ -218,10 +182,7 @@ router.put("/:id", uploadGroupPhoto.single("group_photo"), async (req, res) => {
     res.json({ success: result.affectedRows > 0 });
   } catch (err) {
     console.error("Error updating group:", err);
-    res.status(500).json({
-      error: "Error updating group",
-      details: err.message,
-    });
+    res.status(500).json({ error: "Error updating group" });
   }
 });
 
@@ -230,38 +191,30 @@ router.delete("/:id", async (req, res) => {
   try {
     const groupId = req.params.id;
     const teacherId = await getTeacherId(req);
-
+    
     const [group] = await db.promise().query(
       `SELECT subject_group_photo FROM subject_groups 
        WHERE subject_group_id = ? AND teacher_id = ?`,
       [groupId, teacherId]
     );
-
+    
     if (!group.length) {
       return res.status(403).json({ error: "Not authorized" });
     }
 
-    // Delete associated photo if exists
     if (group[0].subject_group_photo) {
-      storageManager.deleteFile(
-        "subjectGroupPhotos",
-        storageManager.getFilenameFromPath(group[0].subject_group_photo)
-      );
+      storageManager.deleteFile('subjectGroupPhotos', group[0].subject_group_photo);
     }
 
-    await db
-      .promise()
-      .query("DELETE FROM subject_groups WHERE subject_group_id = ?", [
-        groupId,
-      ]);
+    await db.promise().query(
+      "DELETE FROM subject_groups WHERE subject_group_id = ?",
+      [groupId]
+    );
 
     res.json({ success: true });
   } catch (err) {
     console.error("Error deleting group:", err);
-    res.status(500).json({
-      error: "Error deleting group",
-      details: err.message,
-    });
+    res.status(500).json({ error: "Error deleting group" });
   }
 });
 

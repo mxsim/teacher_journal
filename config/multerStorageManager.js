@@ -170,6 +170,48 @@ class MulterStorageManager {
   }
 
   /**
+   * Renames a file within the same storage configuration
+   * @param {string} configName - Storage configuration name
+   * @param {string} oldFilename - Current filename
+   * @param {string} newFilename - New filename
+   * @returns {boolean} True if rename was successful
+   */
+  renameFile(configName, oldFilename, newFilename) {
+    if (!this.configurations[configName]) {
+      throw new Error(`Storage configuration "${configName}" not found`);
+    }
+
+    const oldPath = this.getFilePath(configName, oldFilename);
+    const newPath = this.getFilePath(configName, newFilename);
+
+    if (fs.existsSync(oldPath)) {
+      fs.renameSync(oldPath, newPath);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Extracts just the filename from a path
+   * @param {string} filePath - Full path or filename
+   * @returns {string} Just the filename with extension
+   */
+  getFilenameFromPath(filePath) {
+    return path.basename(filePath);
+  }
+
+  /**
+   * Changes a file's extension
+   * @param {string} filename - Original filename
+   * @param {string} newExtension - New extension (with dot, e.g. '.jpg')
+   * @returns {string} Filename with new extension
+   */
+  changeFileExtension(filename, newExtension) {
+    const ext = path.extname(filename);
+    return filename.replace(new RegExp(`${ext}$`), newExtension);
+  }
+
+  /**
    * Get the public URL for a stored file
    * @param {string} configName - Name of the storage configuration
    * @param {string} filename - Name of the file

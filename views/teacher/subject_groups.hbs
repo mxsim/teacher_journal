@@ -18,7 +18,7 @@
       <div class="group-card" data-id="{{subject_group_id}}" data-subject="{{subject_name}}">
         <div class="group" onclick="window.location.href='/group/{{subject_group_id}}'">
           <div class="group-image">
-<img src="{{#if subject_group_photo}}/uploads/subject_groups/subject_group_photos/{{subject_group_photo}}{{else}}/img/default-group.jpg{{/if}}" alt="Group Picture" class="group-image">          </div>
+<img src="{{photoUrl}}" alt="Group Picture" class="group-image">          </div>
           <div class="group-info">
             <div class="group-name">{{group_name}}</div>
             <div class="subject-name">{{subject_name}}</div>
@@ -93,8 +93,8 @@
             <input type="hidden" id="edit-current-photo" name="current_photo">
 
             <div id="edit-photo-preview" class="image-preview">
-  {{#if subject_group_photo}}
-    <img src="/uploads/subject_groups/subject_group_photos/{{subject_group_photo}}" alt="Current Group Photo">
+  {{#if photoUrl}}
+    <img src="{{photoUrl}}" alt="Current Group Photo">
   {{/if}}
 </div>
           </div>
