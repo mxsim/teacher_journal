@@ -1,0 +1,129 @@
+<!-- group_subjects.hbs -->
+<div class="profile-container">
+  <div class="profile">
+    <div class="controls">
+      <input type="text" id="group-search" class="search-input" placeholder="Search groups by name">
+      <select id="group-sort" class="sort-select">
+        <option value="asc">Sort A-Z</option>
+        <option value="desc">Sort Z-A</option>
+      </select>
+      
+      {{#if isTeacher}}
+      <button id="add-group-btn" class="add-group-btn">Add Group</button>
+      {{/if}}
+    </div>
+
+    <div id="groups-container">
+      {{#each groups}}
+      <div class="group-card" data-id="{{subject_group_id}}" data-subject="{{subject_name}}">
+        <div class="group" onclick="window.location.href='/group/{{subject_group_id}}'">
+          <div class="group-image">
+<img src="{{#if subject_group_photo}}/uploads/subject_groups/subject_group_photos/{{subject_group_photo}}{{else}}/img/default-group.jpg{{/if}}" alt="Group Picture" class="group-image">          </div>
+          <div class="group-info">
+            <div class="group-name">{{group_name}}</div>
+            <div class="subject-name">{{subject_name}}</div>
+          </div>
+        </div>
+        <div class="dropdown">
+          <button class="dots-btn">⋮</button>
+          <div class="dropdown-menu">
+            <button class="edit-group-btn">Edit</button>
+            <button class="delete-group-btn">Delete</button>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+
+    <!-- Add Group Modal -->
+    <div id="add-group-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Add New Group</h2>
+        <form id="add-group-form" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="add-group-name">Group Name:</label>
+            <input type="text" id="add-group-name" name="group-name" required>
+          </div>
+          <div class="form-group">
+            <label for="add-subject-id">Subject:</label>
+            <select id="add-subject-id" name="subject_id" required>
+              <option value="">Select Subject</option>
+              {{#each subjects}}
+              <option value="{{subject_id}}">{{subject_name}}</option>
+              {{/each}}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="add-group-photo">Group Photo:</label>
+            <input type="file" id="add-group-photo" name="group_photo" accept="image/*">
+            <div id="add-photo-preview" class="image-preview"></div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="submit-btn">Add Group</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Group Modal -->
+    <div id="edit-group-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Edit Group</h2>
+        <form id="edit-group-form" enctype="multipart/form-data">
+          <input type="hidden" id="edit-group-id" name="subject_group_id">
+          <div class="form-group">
+            <label for="edit-group-name">Group Name:</label>
+            <input type="text" id="edit-group-name" name="group-name" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-subject-id">Subject:</label>
+            <select id="edit-subject-id" name="subject_id" required>
+              <option value="">Select Subject</option>
+              {{#each subjects}}
+              <option value="{{subject_id}}">{{subject_name}}</option>
+              {{/each}}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-group-photo">Group Photo:</label>
+            <input type="file" id="edit-group-photo" name="group_photo" accept="image/*">
+            <input type="hidden" id="edit-current-photo" name="current_photo">
+
+            <div id="edit-photo-preview" class="image-preview">
+  {{#if subject_group_photo}}
+    <img src="/uploads/subject_groups/subject_group_photos/{{subject_group_photo}}" alt="Current Group Photo">
+  {{/if}}
+</div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="submit-btn">Update Group</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-group-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Delete Group</h2>
+        <form id="delete-group-form">
+          <input type="hidden" id="delete-group-id" name="subject_group_id">
+          <div class="form-group">
+            <p>Are you sure you want to delete <strong id="delete-group-name"></strong>?</p>
+            <p class="warning-text">This action cannot be undone!</p>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="delete-confirm-btn">Delete Group</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<!-- main_header.hbs -->
+
+<header>
+  <nav class="top-nav header-{{role}}">
+    <ul class="top-nav__list">
+      <li><a href="/user_profile/{{user_id}}">Profile</a></li>
+      
+      {{#if (eq role "teacher")}}
+        <li><a href="/journal">Journal</a></li>
+        <li><a href="/subjects">Subjects</a></li>
+        <li><a href="/groups">Groups</a></li>
+        <li><a href="/users">Users</a></li>
+      {{/if}}
+
+      {{#if (eq role "admin")}}
+        <li><a href="/admin-dashboard">Admin Panel</a></li>
+      {{/if}}
+      {{#if (eq role "student")}}
+        <li><a href="/student-summary">Summary</a></li>
+      {{/if}}
+
+      <li class="logout"><a href="/logout">Logout</a></li>
+    </ul>
+  </nav>
+</header>

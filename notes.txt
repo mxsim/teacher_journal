@@ -1,0 +1,72 @@
+npm isntall multer --save
+
+after installing multer got:
+
+added 18 packages, and audited 178 packages in 9s
+
+20 packages are looking for funding
+  run `npm fund` for details
+
+12 vulnerabilities (4 low, 4 high, 4 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+
+
+---
+
+
+okay look, i have codes where i face these issues:
+
+- finally fix issue with uploading image of user in project and store path of image to the database, also find appropriate logic when user wants to edit image and replace image file in storage and update path in database;
+- finally fix editing description of users description;
+
+
+
+
+
+
+
+
+
+
+
+
+
+users that are in web:
+admin
+student
+teacher
+
+
+--- 
+pages and their functionality:
+
+
+login:
+ email field
+ password field
+ login user
+
+
+user profile:
+
+displays: user profile, name, surname, parent name, email, role, description
+edit description
+change user profile icon
+
+users:
+displays list of all existing users, their user profile, name, surname, parent name, email, role, speciality (if student)
+filters: search bar by name, display users by role (admin, teacher, student)
+click on user to redirect their user profile
+
+groups:
+displays groups associated by teacher: subject group photo, group name, department associated by teacher
+filters: search bar by name, sort by a-z, z-a
+add subject group: 

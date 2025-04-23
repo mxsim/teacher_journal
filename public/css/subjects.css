@@ -1,0 +1,387 @@
+/* subjects.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    text-align: center;
+    background-color: #f8f9fa;
+}
+
+.controls {
+    margin-bottom: 20px;
+}
+
+.search-input,
+.sort-select,
+.filter-select,
+.add-subject-btn {
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* Keep styles for specific elements only */
+#subjects-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: left;
+}
+
+.subject-card {
+    position: relative;
+    width: 570px;
+    margin-bottom: 20px;
+}
+
+.subject {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.subject-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: left;
+}
+
+.department-name {
+    font-size: 0.9em;
+    color: #aaa;
+    text-align: left;
+    margin-top: 5px;
+}
+
+.subject-image img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.subject-info {
+    padding: 15px;
+}
+
+.groups {
+    font-size: 14px;
+    color: #555;
+    text-align: right;
+    padding-right: 10px;
+}
+
+
+
+
+
+
+
+.dots-btn {
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    position: relative;
+}
+
+
+
+
+
+
+
+
+.dropdown {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 5px 0;
+    min-width: 120px;
+}
+
+.subject-card:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu button {
+    display: block;
+    width: 100%;
+    padding: 8px 15px;
+    text-align: left;
+    background: none;
+    border: none;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.dropdown-menu button:hover {
+    background-color: #f5f5f5;
+}
+
+.dropdown-menu .edit-btn {
+    color: #3498db;
+}
+
+.dropdown-menu .delete-btn {
+    color: #e74c3c;
+}
+
+
+
+
+
+
+
+
+
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+}
+
+.close {
+    color: #aaa;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+
+
+
+
+
+
+/* modal */
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+.modal.show {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.modal.show .modal-content {
+    transform: translateY(0);
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: #0069ba;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+#modal-title {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #34495e;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.cancel-btn,
+.submit-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cancel-btn {
+    background-color: #f1f1f1;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.cancel-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.submit-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+}
+
+.submit-btn:hover {
+    background-color: #2980b9;
+}
+
+/* image preview styling */
+.image-preview {
+    position: relative;
+    max-width: 100%;
+    margin: 15px 0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.image-preview img {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+        max-width: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+        border: 1px solid #eee;
+}
+
+.form-group input[type="file"] {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f9f9f9;
+}
+
+
+
+/* Delete Modal Specific Styling */
+#delete-subject-modal .modal-content {
+    max-width: 450px;
+}
+
+.warning-text {
+    color: #e74c3c;
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+.delete-confirm-btn {
+    background-color: #e74c3c !important;
+    color: white !important;
+    border: none !important;
+}
+
+.delete-confirm-btn:hover {
+    background-color: #c0392b !important;
+}
+
+#delete-subject-modal .form-group {
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    margin-bottom: 25px;
+}
+
+#delete-subject-modal .form-group p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+#delete-subject-modal .form-group strong {
+    color: #2c3e50;
+    font-weight: 600;
+}

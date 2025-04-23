@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{group.group_name}} - Group Profile</title>
+  <link rel="stylesheet" href="/css/group_profile.css">
+</head>
+<body>
+  <div class="group-header" style="background-color: #4a6fa5;">
+    <h1>{{group.group_name}}</h1>
+    <div class="teacher-info">
+      <p>Викладач: {{group.teacher_name}} {{group.teacher_surname}}</p>
+    </div>
+  </div>
+
+  <div class="group-controls">
+    {{#if isOwner}}
+      <button class="add-student-btn" onclick="toggleStudentSearch()">+ Додати студента</button>
+    {{/if}}
+    
+    <div class="search-sort-container">
+      <input type="text" id="studentSearch" placeholder="Пошук студентів..." class="search-input">
+      <select id="sortStudents" class="sort-select">
+        <option value="asc">A-Z</option>
+        <option value="desc">Z-A</option>
+        <option value="speciality">За спеціальністю</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Модальне вікно для пошуку студентів -->
+  <div id="studentSearchModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="toggleStudentSearch()">&times;</span>
+      <h3>Додати студента до групи</h3>
+      <input type="text" id="searchStudentInput" placeholder="Введіть ім'я або email">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+  </div>
+
+  <div class="students-container">
+    <div class="students-header">
+      <div>ПІБ</div>
+      <div>Спеціальність</div>
+      {{#if isOwner}}<div>Дії</div>{{/if}}
+    </div>
+    
+    <div class="students-list">
+      {{#each students}}
+        <div class="student-item" data-speciality="{{this.speciality_abbreviation}}">
+          <div class="student-info">
+            <span>{{this.surname}} {{this.name}} {{this.parent_name}}</span>
+          </div>
+          <div class="student-speciality">
+            {{this.speciality_abbreviation}}
+          </div>
+          {{#if ../isOwner}}
+            <div class="student-actions">
+              <button class="remove-btn" 
+                      onclick="removeStudent({{../group.subject_group_id}}, {{this.user_id}})">
+                Видалити
+              </button>
+            </div>
+          {{/if}}
+        </div>
+      {{/each}}
+    </div>
+  </div>
+
+  <script src="/js/client_group_profile.js"></script>
+</body>
+</html>

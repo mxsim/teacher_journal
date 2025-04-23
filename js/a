@@ -1,0 +1,279 @@
+/* server_group_subjects.js */
+const express = require("express");
+const router = express.Router();
+const db = require("../config/db");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(
+      __dirname,
+      "../public/uploads/subject_groups/subject_group_photos"
+    );
+    if (!fs.existsSync(uploadPath))
+      fs.mkdirSync(uploadPath, { recursive: true });
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    // For edits: Use existing group ID (PUT /groups/:id)
+    if (req.params.id) {
+      const ext = path.extname(file.originalname);
+      cb(null, `subj_group_${req.params.id}${ext}`);
+    }
+    // For new groups: Use a temp name (will be renamed later)
+    else {
+      const ext = path.extname(file.originalname);
+      cb(null, `temp_${Date.now()}${ext}`);
+    }
+  },
+});
+
+const upload = multer({ storage });
+
+// Helper function to get teacher ID
+const getTeacherId = async (req) => {
+  const [teacher] = await db
+    .promise()
+    .query("SELECT teacher_id FROM teachers WHERE user_id = ?", [
+      req.session.userId,
+    ]);
+  return teacher[0]?.teacher_id;
+};
+
+// GET groups page
+router.get("/", async (req, res) => {
+  console.log("hi");
+  try {
+    const teacherId = await getTeacherId(req);
+    let groupsQuery = "";
+    let params = [];
+    if (req.session.role === "teacher" && teacherId) {
+      groupsQuery = `
+        SELECT sg.*, s.subject_name
+        FROM subject_groups sg
+        JOIN subjects s ON sg.subject_id = s.subject_id
+        WHERE sg.teacher_id = ?
+      `;
+      params = [teacherId];
+    } else {
+      // For students, assuming a join through collaborative_groups (adjust student mapping as necessary)
+      groupsQuery = `
+        SELECT sg.*, s.subject_name
+        FROM subject_groups sg
+        JOIN subjects s ON sg.subject_id = s.subject_id
+        JOIN collaborative_groups cg ON sg.subject_group_id = cg.subject_group_id
+        WHERE cg.student_id = ?
+      `;
+      params = [req.session.userId];
+    }
+    const [groups] = await db.promise().query(groupsQuery, params);
+
+    // Clean up photo paths for all groups
+    const cleanedGroups = groups.map((group) => ({
+      ...group,
+      subject_group_photo: group.subject_group_photo
+        ? path.basename(group.subject_group_photo)
+        : null,
+    }));
+
+    // For teacher users: retrieve subjects for the add/edit forms
+    let subjects = [];
+    if (req.session.role === "teacher" && teacherId) {
+      const [subs] = await db
+        .promise()
+        .query(
+          "SELECT subject_id, subject_name FROM subjects WHERE teacher_id = ?",
+          [teacherId]
+        );
+      subjects = subs;
+    }
+    res.render("teacher/subject_groups", {
+      groups: cleanedGroups,
+      subjects,
+      isTeacher: req.session.role === "teacher",
+      user_id: req.session.userId,
+      role: req.session.role,
+      title: "My Groups",
+      scripts: ["teacher/client_subject_groups"],
+      styles: ["main_styles", "subject_groups"],
+    });
+  } catch (err) {
+    console.error("Error loading groups:", err);
+    res.status(500).send("Error loading groups");
+  }
+});
+
+// GET single group data for editing
+// In GET /groups/:id route
+router.get("/:id", async (req, res) => {
+  try {
+    const groupId = req.params.id;
+    const teacherId = await getTeacherId(req);
+
+    const [rows] = await db.promise().query(
+      `SELECT sg.*, s.subject_name
+       FROM subject_groups sg
+       JOIN subjects s ON sg.subject_id = s.subject_id
+       WHERE sg.subject_group_id = ? AND sg.teacher_id = ?`,
+      [groupId, teacherId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+
+    const groupData = rows[0];
+
+    // Ensure we're returning just the filename
+    if (groupData.subject_group_photo) {
+      groupData.subject_group_photo = path.basename(
+        groupData.subject_group_photo
+      );
+    }
+
+    res.json(groupData);
+  } catch (err) {
+    console.error("Error fetching group:", err);
+    res.status(500).json({ error: "Error fetching group" });
+  }
+});
+
+// Add new group
+router.post("/add", upload.single("group_photo"), async (req, res) => {
+  try {
+    const { "group-name": groupName, subject_id: subjectId } = req.body;
+    const teacherId = await getTeacherId(req);
+    if (!teacherId) return res.status(403).json({ error: "Teacher not found" });
+
+    // Insert the group (without photo first to get the ID)
+    const [result] = await db.promise().query(
+      `INSERT INTO subject_groups (group_name, subject_id, teacher_id)
+       VALUES (?, ?, ?)`,
+      [groupName, subjectId, teacherId]
+    );
+    const groupId = result.insertId;
+
+    let groupPhoto = null;
+    if (req.file) {
+      const ext = path.extname(req.file.originalname);
+      const newFilename = `subj_group_${groupId}${ext}`;
+      const oldPath = req.file.path;
+      const newPath = path.join(path.dirname(oldPath), newFilename);
+
+      // Rename the temp file
+      fs.renameSync(oldPath, newPath);
+
+      // Store ONLY the filename (not full path)
+      groupPhoto = newFilename;
+
+      // Update DB with the filename
+      await db
+        .promise()
+        .query(
+          `UPDATE subject_groups SET subject_group_photo = ? WHERE subject_group_id = ?`,
+          [groupPhoto, groupId]
+        );
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error adding group:", err);
+    res.status(500).json({ error: "Error adding group" });
+  }
+});
+
+// Update group
+router.put("/:id", upload.single("group_photo"), async (req, res) => {
+  try {
+    const {
+      "group-name": groupName,
+      subject_id: subjectId,
+      current_photo: currentPhoto,
+    } = req.body;
+    const teacherId = await getTeacherId(req);
+    const groupId = req.params.id;
+    if (!teacherId) return res.status(403).json({ error: "Teacher not found" });
+
+    let groupPhoto = currentPhoto;
+    if (req.file) {
+      const ext = path.extname(req.file.originalname);
+      const newFilename = `subj_group_${groupId}${ext}`;
+
+      // Delete old photo (if exists)
+      if (currentPhoto) {
+        const oldPath = path.join(
+          __dirname,
+          "../public/uploads/subject_groups/subject_group_photos",
+          currentPhoto
+        );
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
+
+      // Store ONLY the filename (not full path)
+      groupPhoto = newFilename;
+    }
+
+    // Update DB with the new filename
+    const [result] = await db.promise().query(
+      `UPDATE subject_groups SET
+         group_name = ?,
+         subject_id = ?,
+         subject_group_photo = ?
+       WHERE subject_group_id = ? AND teacher_id = ?`,
+      [groupName, subjectId, groupPhoto, groupId, teacherId]
+    );
+
+    res.json({ success: result.affectedRows > 0 });
+  } catch (err) {
+    console.error("Error updating group:", err);
+    res.status(500).json({ error: "Error updating group" });
+  }
+});
+// Delete group
+// Delete group
+router.delete("/:id", async (req, res) => {
+  try {
+    const groupId = req.params.id;
+    const teacherId = await getTeacherId(req);
+
+    // First get the group info including the photo filename
+    const [group] = await db.promise().query(
+      `SELECT subject_group_photo FROM subject_groups 
+       WHERE subject_group_id = ? AND teacher_id = ?`,
+      [groupId, teacherId]
+    );
+
+    if (!group.length) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    // Delete the associated image file if it exists
+    if (group[0].subject_group_photo) {
+      const filePath = path.join(
+        __dirname,
+        "../public/uploads/subject_groups/subject_group_photos",
+        group[0].subject_group_photo
+      );
+
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    // Then delete the group record
+    await db
+      .promise()
+      .query("DELETE FROM subject_groups WHERE subject_group_id = ?", [
+        groupId,
+      ]);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error deleting group:", err);
+    res.status(500).json({ error: "Error deleting group" });
+  }
+});
+
+module.exports = router;

@@ -1,0 +1,62 @@
+
+  <div class="profile-container">
+    <div class="profile">
+      <!-- Left section: Profile image and editable elements -->
+      <div class="left-section">
+        <div class="profile-picture-container">
+            <img src="{{#if profile_picture}}{{profile_picture}}{{else}}/img/header.jpg{{/if}}" alt="Profile Picture" class="profile-image" id="user-img">
+          
+          <!-- Conditionally display image overlay for isOwner only -->
+          {{#if isOwner}}
+            <input type="file" id="upload-image" style="display: none;">
+            <div class="image-overlay">Change Picture</div>
+          {{/if}}
+          
+        </div>
+        <p id="error-msg" class="error-msg"></p>
+      </div>
+      
+      <!-- Right section: User details -->
+      <div class="right-section">
+        <h2 class="user-fullname">{{name}} {{surname}}, {{parent_name}}</h2>
+        <p><strong>Email:</strong> {{email}} </p>
+        <p><strong>Role:</strong> {{role}}</p>
+
+        {{#if isStudent}}
+          <p><strong>Speciality:</strong> {{speciality}}</p>
+        {{/if}}
+
+        <!-- Description Section -->
+        <div class="user-description">
+          <div class="description-header">
+            <strong>Description</strong>
+            {{#if isOwner}}
+              <button id="edit-desc-btn" class="edit-btn"><i class="fa fa-pen"></i> Edit</button>
+            {{/if}}
+          </div>
+
+          <div id="desc-container">
+            {{#if editingDesc}}
+              <textarea id="desc-input">{{description}}</textarea>
+              <button id="save-desc" class="save-btn"><i class="fa fa-check"></i> Save</button>
+            {{else}}
+              <p id="desc-text">{{description}}</p>
+            {{/if}}
+          </div>
+        </div>
+
+        <!-- Change profile picture form (visible when owner) -->
+        {{#if isOwner}}
+          <form id="desc-form" style="display: none;">
+            <textarea id="desc-input">{{description}}</textarea>
+            <button type="submit">Save</button>
+          </form>
+
+          <form id="picture-form" style="display: none;" enctype="multipart/form-data">
+            <input type="file" name="profile_picture">
+            <button type="submit">Upload</button>
+          </form>
+        {{/if}}
+      </div>
+    </div>
+  </div>

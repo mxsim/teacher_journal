@@ -1,0 +1,133 @@
+/* main_styles.css */
+/* ===== BASE STYLES ===== */
+.app-body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+}
+
+.app-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+    padding: 20px;
+    flex: 1;
+    /* Takes all available space */
+    display: flex;
+    flex-direction: column;
+}
+
+.app-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+/* ===== ROLE-BASE STYLES ===== */
+/* Header */
+.top-nav {
+    overflow: hidden;
+}
+
+.top-nav .logout {
+    float: right;
+}
+
+
+.top-nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.top-nav li {
+    display: inline-block;
+}
+
+.top-nav a {
+    display: block;
+    padding: 20px 20px;
+    color: #fff;
+    text-decoration: none;
+}
+
+
+
+
+
+
+.top-nav.header-admin {
+    background-color: #1d643b;
+    /* Dark green */
+}
+
+.top-nav.header-teacher {
+    background-color: #007bff;
+    /* Blue */
+}
+
+.top-nav.header-student {
+    background-color: #ff8c00;
+    /* Orange */
+}
+
+/* Footer */
+.footer-nav {
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+}
+
+
+.footer-nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-nav li {
+    display: inline;
+    margin-right: 20px;
+}
+
+.footer-nav a {
+    color: #fff;
+    text-decoration: none;
+}
+
+
+
+
+
+
+
+
+
+.footer-nav.footer-admin {
+    background-color: #1d643b;
+    /* Dark green */
+}
+
+.footer-nav.footer-teacher {
+    background-color: #007bff;
+    /* Blue */
+}
+
+.footer-nav.footer-student {
+    background-color: #ff8c00;
+    /* Orange */
+}
+
+/* ===== NAVIGATION COMPONENTS ===== */

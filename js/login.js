@@ -6,7 +6,11 @@ const connection = require('../config/db');
 // Route handler for rendering the login page
 router.get('/', (req, res) => {
   console.log("Rendering login page");
-  res.render('login'); // Assuming your login page is named 'login.hbs'
+
+  res.render("login", {
+    layout: false,
+    styles: ["styles"] // Additional CSS if needed
+  }); // Assuming your login page is named 'login.hbs'
 });
 
 // changes to check for folder cmd
@@ -42,19 +46,21 @@ router.post('/', (req, res) => {
       switch (user.role) {
         case 'admin':
           console.log("Redirecting to admin_dashboard for email:", email);
-          res.redirect('/admin_dashboard');
+          res.redirect(`/user_profile/${user.user_id}`);
           break;
         case 'teacher':
           console.log("Redirecting to teacher_dashboard for email:", email);
-          res.redirect('/teacher_dashboard');
+          res.redirect(`/user_profile/${user.user_id}`);
           break;
         case 'student':
           console.log("Redirecting to student_dashboard for email:", email);
-          res.redirect("/student_dashboard");
+          res.redirect(`/user_profile/${user.user_id}`);
           break;
         default:
           console.log("Invalid role for email:", email);
           res.status(403).send('Forbidden');
+        
+
       }
     }
   );

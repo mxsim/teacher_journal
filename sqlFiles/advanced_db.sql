@@ -1,8 +1,8 @@
 -- Drop tables if they exist
-DROP DATABASE IF EXISTS journaldb;
+DROP DATABASE IF EXISTS journaldb_test;
 
-CREATE DATABASE IF NOT EXISTS journaldb;
-USE journaldb;
+CREATE DATABASE IF NOT EXISTS journaldb_test;
+USE journaldb_test;
 
 -- Table: users
 CREATE TABLE IF NOT EXISTS users (

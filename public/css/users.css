@@ -1,0 +1,109 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.controls {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.search-input,
+.sort-select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#users-container {
+    margin-top: 20px;
+}
+
+.user-header {
+    display: grid;
+    grid-template-columns: 100px 1fr 150px 150px 200px;
+    gap: 15px;
+    font-weight: bold;
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.header-item {
+    text-align: center;
+}
+
+.user-item {
+    display: grid;
+    grid-template-columns: 100px 1fr 150px 150px 200px;
+    gap: 15px;
+    padding: 10px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.user-photo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.user-info {
+    text-align: center;
+    /* Center the text */
+}
+
+.user-role,
+.user-specialization {
+    text-align: center;
+    font-style: italic;
+}
+
+.user-email {
+    text-align: center;
+}
+
+/* Style for "Нікого немає" */
+#users-container p {
+    text-align: center;
+    font-size: 18px;
+    color: #555;
+}
+
+/* Add responsiveness for smaller screens */
+@media (max-width: 768px) {
+    .user-header {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .user-item {
+        grid-template-columns: 1fr 1fr;
+    }
+}

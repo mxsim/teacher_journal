@@ -1,28 +1,14 @@
 <!-- footer.hbs -->
-{{#if role}}
-  {{#if role "admin"}}
-    <footer class="footer-nav" style="background-color: #333;">
-      <ul>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Terms of Service</a></li>
-        <li><a href="#">Contact Us</a></li>
-      </ul>
-    </footer>
-  {{else if role "teacher"}}
-    <footer class="footer-nav" style="background-color: blue;">
-      <ul>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Terms of Service</a></li>
-        <li><a href="#">Contact Us</a></li>
-      </ul>
-    </footer>
-  {{else if role "student"}}
-    <footer class="footer-nav" style="background-color: orange;">
-      <ul>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Terms of Service</a></li>
-        <li><a href="#">Contact Us</a></li>
-      </ul>
-    </footer>
-  {{/if}}
+{{#if (eq role "admin")}}
+  <footer class="footer-nav" style="background-color: #333;">
+    <!-- admin footer content -->
+  </footer>
+{{else if (eq role "teacher")}}
+  <footer class="footer-nav" style="background-color: blue;">
+    <!-- teacher footer content -->
+  </footer>
+{{else if (eq role "student")}}
+  <footer class="footer-nav" style="background-color: orange;">
+    <!-- student footer content -->
+  </footer>
 {{/if}}

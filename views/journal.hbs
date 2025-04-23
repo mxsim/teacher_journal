@@ -1,289 +1,371 @@
 <!-- journal.hbs -->
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>Journal</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/login.css" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/journal.css" />
+    <meta charset="utf-8" />
+    </head>
+<body>
+
+
 <header>
-  <nav class="top-nav" style="background-color: #007bff;">
-    <ul>
-      <li><a href="/journal">Journal</a></li>
-      <li><a href="#">Groups</a></li>
-      <li><a href="#">Users</a></li>
-      <li class="logout"><a href="/logout">Logout</a></li>
-      <!-- Update the href attribute -->
+  <nav class="header" style="background-color: #007bff;">
+    <ul class="nav-list">
+      <li class="nav-item journal-item"><a href="/journal">Journal</a></li>
+      <li class="nav-item subjects-item"><a href="/subject">Subjects</a></li>
+      <li class="nav-item logout"><a href="/logout">Logout</a></li>
     </ul>
   </nav>
 </header>
 
+
+
+
+
+
+
+
 <div class="journal-cont-bod">
-  <div class="journal-cont">
-
+<div class="journal-cont">
     <!-- Middle Block: Journal Table -->
-    <div class="journal-container">
-      <div class="inline-container">
-        <h3 class="main-label">Subject Groups</h3>
-        <button class="edit-button">Edit</button>
-      </div>
-        <label for="month">Month:</label>
+<div class="journal-container">
 
-        <select id="month" data-months="{{months}}">
-  <!-- Options will be populated dynamically by JavaScript -->
-</select>
-    <label for="year">Year:</label>
+<div class="main-block">
 
-<select id="year" data-years="{{years}}">
-  <!-- Options will be populated dynamically by JavaScript -->
-</select>
-    <label for="group">Group:</label>
 
-<select id="group" data-groups="{{groups}}">
-  <!-- Options will be populated dynamically by JavaScript -->
-</select> 
-   <label for="subject">Subject:</label>
 
+
+
+
+
+
+
+
+
+    <div class="left-element">
+
+
+
+<label for="subject">Subject:</label>
 <select id="subject" data-subjects="{{subjects}}">
-  <!-- Options will be populated dynamically by JavaScript -->
 </select>
+
+<label for="group">Group:</label>
+<select id="group" data-groups="{{groups}}">
+</select>
+
+
+<label for="month">Month:</label>
+<select id="month" data-months="{{months}}">
+</select>
+
+
+<label for="year">Year:</label>
+<select id="year" data-years="{{years}}">
+</select>
+
+
+
+
+
 
 
 
 
 
     <button id="display-btn" >Display</button>
-<button  id="edit-btn">Edit</button>  
-    <div id="table-container" style="margin-top: 20px;"></div>
 
 
-      </div>
     </div>
 
 
-  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="right-element">
+
+<div class="lesson-block">
+    <div class="lesson-block-header">
+        <h2>Lessons Management: </h2>
+        <button class="lesson-fold-btn" onclick="toggleLessonForm()">◀</button>
+    </div>
+
+    <div class="lesson-block-container collapsed" id="lessonContainer">
+        <div class="lesson-action-button-block">
+            <button class="lesson-action-btn active" onclick="handleLessonActionButtonClick(event, 'add')" data-form="add">Add</button>
+            <button class="lesson-action-btn" onclick="handleLessonActionButtonClick(event, 'update')" data-form="update">Update</button>
+            <button class="lesson-action-btn" onclick="handleLessonActionButtonClick(event, 'delete')" data-form="delete">Remove</button>
+        </div>
+        
+        
+        
+        <div class="lesson-message-container">hi</div> <!-- Container for messages -->
+         <div class="main-lesson-block">                              
+            <div class="lesson-search-container">
+
+
+                <input type="text" id="lessonSubjectSearchInput" placeholder="Search for a subject...">
+                
+                <div class="lesson-dropdown" id="lessonSubjectDropdown" style="display: none;">
+                    <ul id="lessonSubjectList" class="lesson-dropdown-content"></ul>
+                </div>
+
+
+            </div>
+
+            
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div class="forms" id="lessonForms">
+            <div class="lesson-add-form" id="lessonAddForm" style="display: block;"> 
+
+                <div class="form-group">
+                    <label for="lesson-date">Lesson Date:</label>
+                    <input type="text" id="add-lesson-date" placeholder="MM/DD/YYYY">
+                </div>
+                <div class="form-group">
+                    <label for="lesson-type">Lesson Type:</label>
+                    <select id="add-lesson-type" autocomplete="off"></select>
+                </div>
+                <div class="button-block"> <!-- New container for buttons -->
+                    <button class="lesson-save-button">Save</button>
+                </div>
+            </div>
+            <div class="lesson-update-form" id="lessonUpdateForm">
+
+                <div class="form-group">
+                    <label for="lesson-date">Lesson Date (Old):</label>
+                    <input type="text" id="update-from-lesson-date" placeholder="MM/DD/YYYY">
+
+                    <label for="lesson-date">Lesson Date (New):</label>
+                    <input type="text" id="update-to-lesson-date" placeholder="MM/DD/YYYY">
+                </div>
+                <div class="form-group">
+                    <label for="lesson-type">Lesson Type (Old):</label>
+                    <select id="update-from-lesson-type" autocomplete="off"></select>
+
+                    <label for="lesson-type">Lesson Type (New):</label>
+                    <select id="update-to-lesson-type" autocomplete="off"></select>
+                </div>
+                <div class="button-block"> <!-- New container for buttons -->
+                    <button class="lesson-update-button">Update</button>
+                </div>
+            </div>
+            <div class="lesson-delete-form" id="lessonDeleteForm">
+
+                <div class="form-group">
+                    <label for="lesson-date">Lesson Date:</label>
+                    <input type="text" id="delete-lesson-date" placeholder="MM/DD/YYYY">
+                </div>
+                <div class="form-group">
+                    <label for="lesson-type">Lesson Type:</label>
+                    <select id="delete-lesson-type" autocomplete="off"></select>
+                </div>
+                <div class="button-block"> <!-- New container for buttons -->
+                    <button class="lesson-delete-button">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<footer class="footer-nav" style="background-color: #007bff;">
-  <ul>
-    <li><a href="#">Copyright 2024, All rights reserved.</a></li>
-  </ul>
+
+
+
+
+
+
+
+
+
+
+
+<div class="grade-block">
+    <div class="grade-block-header">
+        <h2>Grade Management: </h2>
+        <button class="grade-fold-btn" onclick="toggleGradeForm()">◀</button>
+    </div>
+
+    <div class="grade-block-container collapsed" id="gradeContainer">
+        <div class="grade-action-button-block">
+            <button class="grade-action-btn active" onclick="handleGradeActionButtonClick(event, 'add')" data-form="add">Add</button>
+            <button class="grade-action-btn" onclick="handleGradeActionButtonClick(event, 'update')" data-form="update">Update</button>
+            <button class="grade-action-btn" onclick="handleGradeActionButtonClick(event, 'delete')" data-form="delete">Remove</button>
+        </div>
+        
+        <div class="grade-message-container">hi</div> <!-- Container for messages -->
+
+
+        <div class="main-grade-block">                              
+            <div class="grade-search-container">
+
+
+                <input type="text" id="gradeSubjectSearchInput" placeholder="Search for a subject...">
+                
+                <div class="grade-dropdown" id="gradeSubjectDropdown" style="display: none;">
+                    <ul id="gradeSubjectList" class="grade-dropdown-content"></ul>
+                </div>
+
+
+                <input type="text" id="gradeStudentGroupSearchInput" placeholder="Search for a group...">
+                
+                <div class="grade-dropdown" id="gradeStudentGroupDropdown">
+                    <ul id="gradeStudentGroupList" class="grade-dropdown-content">           </ul>
+                </div>
+
+
+                <input type="text" id="gradeStudentSearchInput" placeholder="Search for a student...">
+                
+                <div class="grade-dropdown" id="gradeStudentDropdown">
+                    <ul id="gradeStudentList" class="grade-dropdown-content">           </ul>
+                </div>
+
+
+
+            </div>
+
+            
+        </div>
+
+
+
+        <div class="forms" id="gradeForms">
+
+            <div class="grade-add-form" id="gradeAddForm" style="display: block;"> 
+                <div class="form-group">
+                    <label for="grade-date">Lesson Date:</label>
+                    <input type="text" id="add-grade-date" placeholder="MM/DD/YYYY">
+                </div>
+                <div class="form-group">
+                <label for="grade-type">Lesson Type:</label>
+
+                <input type="text" id="LessonTypeAddInput" placeholder="Select lesson type...">
+        
+                </div>
+                <div class="grade-dropdown" id="gradeLessonTypeAddDropdown" style="display: none;">
+                    <ul id="gradeLessonTypeAddList" class="grade-dropdown-content"></ul>
+                </div>
+
+                <div class="form-group">
+                    <label for="grade-date">New Grade:</label>
+                    <input type="text" id="add-grade-grade" placeholder="New grade here...">
+                </div>
+
+                <div class="button-block">
+                    <button class="grade-save-button" id="grade-add-button">Save</button>
+                </div>
+            </div>
+
+            <div class="grade-update-form" id="gradeUpdateForm">
+
+                <div class="form-group">
+                    <label for="grade-date">Lesson Date:</label>
+                    <input type="text" id="update-grade-date" placeholder="MM/DD/YYYY">
+                </div>
+                <div class="form-group">
+                <label for="grade-type">Lesson Type:</label>
+
+                    <input type="text" id="LessonTypeUpdateInput" placeholder="Select lesson type...">
+
+                </div>
+                    
+                    <div class="grade-dropdown" id="gradeLessonTypeUpdateDropdown" style="display: none;">
+                        <ul id="gradeLessonTypeUpdateList" class="grade-dropdown-content"></ul>
+                    </div>
+
+                <div class="form-group">
+                    <label for="grade-date">Update Grade:</label>
+                    <input type="text" id="update-grade-grade" placeholder="Update grade here...">
+                </div>
+                <div class="button-block"> 
+                    <button class="grade-update-button" id="grade-update-button" >Update</button>
+                </div>
+            </div>
+            <div class="grade-delete-form" id="gradeDeleteForm">
+
+                <div class="form-group">
+                    <label for="grade-date">Lesson Date:</label>
+                    <input type="text" id="delete-grade-date" placeholder="MM/DD/YYYY">
+                </div>
+
+                <div class="form-group">
+                    <label for="grade-type">Lesson Type:</label>
+                    <input type="text" id="LessonTypeDeleteInput" placeholder="Select lesson type...">
+                </div>
+
+                <div class="grade-dropdown" id="gradeLessonTypeDeleteDropdown" style="display: none;">
+                    <ul id="gradeLessonTypeDeleteList" class="grade-dropdown-content"></ul>
+                </div>
+
+
+                <div class="button-block">
+                    <button class="grade-delete-button" id="grade-delete-button">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+    </div>
+
+
+
+{{!-- <button  id="edit-btn">Edit</button>   --}}
+    
+    </div>
+
+<div id="table-container" style="margin-top: 20px;"></div>
+
+
+
+
+
+
+      </div>
+  </div>
+
+<footer class="footer" style="background-color: #007bff;">
+    <a class="footer-copyright" >© Copyright 2024, All rights reserved.</a>
 </footer>
 
-<script>
-// Define global variables to hold selected values
-let selectedMonth = '';
-let selectedYear = '';
-let selectedGroup = '';
-let selectedSubject = '';
-
-// Add change event listeners to dropdown menus
-const monthSelect = document.getElementById('month');
-const yearSelect = document.getElementById('year');
-const groupSelect = document.getElementById('group');
-const subjectSelect = document.getElementById('subject');
-
-monthSelect.addEventListener('change', handleDropdownChange);
-yearSelect.addEventListener('change', handleDropdownChange);
-groupSelect.addEventListener('change', handleDropdownChange);
-subjectSelect.addEventListener('change', handleDropdownChange);
-
-// Function to handle change in dropdown menu selection
-function handleDropdownChange(event) {
-    const { id, value } = event.target;
-    switch (id) {
-        case 'month':
-            selectedMonth = value;
-            break;
-        case 'year':
-            selectedYear = value;
-            break;
-        case 'group':
-            selectedGroup = value;
-            break;
-        case 'subject':
-            selectedSubject = value;
-            break;
-        default:
-            break;
-    }
-}
-
-
-
-function editTable() {
-  // Implement functionality to allow users to edit the table and update grades
-  console.log('Editing table...');
-  const tableRows = document.querySelectorAll('.journal-table tbody tr');
-  tableRows.forEach(row => {
-    const studentName = row.querySelector('td:first-child').textContent;
-    const gradeCells = row.querySelectorAll('td:not(:first-child)');
-    gradeCells.forEach((cell, index) => {
-      // Implement logic to allow users to edit grades
-      const gradeInput = document.createElement('input');
-      gradeInput.type = 'text';
-      gradeInput.value = cell.textContent;
-      cell.textContent = '';
-      cell.appendChild(gradeInput);
-    });
-  });
-}
-
-function displayJournal() {
-    console.log('Displaying journal...');
-    const month = document.getElementById('month').value;
-    const year = document.getElementById('year').value;
-    const group = document.getElementById('group').value;
-    const subject = document.getElementById('subject').value;
-
-    console.log('Selected Month:', month);
-    console.log('Selected Year:', year);
-    console.log('Selected Group:', group);
-    console.log('Selected Subject:', subject);
-
-    fetch(`/journal/data?month=${month}&year=${year}&group=${group}&subject=${subject}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Received data:', data);
-            // Check if data is available
-            if (data && data.length > 0) {
-                // If data is available, populate the table
-                populateTable(data);
-            } else {
-                // If no data is available, display a message
-                const tableBody = document.querySelector('.journal-table tbody');
-                if (tableBody) {
-                    tableBody.innerHTML = '<tr><td colspan="5">No data available</td></tr>';
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching journal data:', error);
-        });
-}
-
-function populateTable(journalData) {
-    console.log('Populating table...');
-    const tableBody = document.querySelector('.journal-table tbody');
-    if (!tableBody) {
-        console.error('Table body element not found.');
-        return;
-    }
-    
-    tableBody.innerHTML = '';
-
-    journalData.forEach(entry => {
-        const row = document.createElement('tr');
-        Object.values(entry).forEach(value => {
-            const cell = document.createElement('td');
-            cell.textContent = value;
-            row.appendChild(cell);
-        });
-        tableBody.appendChild(row);
-    });
-}
-
-function saveGrades() {
-    const tableRows = document.querySelectorAll('.journal-table tbody tr');
-    const updatedGrades = [];
-    tableRows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        const studentId = cells[0].getAttribute('data-student-id');
-        const subjectId = cells[2].getAttribute('data-subject-id');
-        const gradeValue = cells[3].textContent; // Assuming grade is in the 4th column
-        const gradeDate = new Date().toISOString().split('T')[0]; // Current date
-
-        updatedGrades.push({ studentId, subjectId, gradeValue, gradeDate });
-    });
-
-    fetch('/journal/update-grades', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updatedGrades)
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log('Grades updated successfully');
-        } else {
-            console.error('Failed to update grades');
-        }
-    })
-    .catch(error => {
-        console.error('Error updating grades:', error);
-    });
-}
-
-function validateAndDisplay() {
-    const month = document.getElementById('month').value;
-    const year = document.getElementById('year').value;
-    const group = document.getElementById('group').value;
-    const subject = document.getElementById('subject').value;
-    if (!month || !year || !group || !subject) {
-        alert('Please select appropriate year, month, subject, and group.');
-    } else {
-        displayJournal();
-    }
-}
-
-function editOrSave() {
-    const editBtn = document.getElementById('edit-btn');
-    if (editBtn.textContent === 'Edit') {
-        alert('No data in table.');
-    } else {
-        saveGrades();
-        displayJournal();
-    }
-}
-
-function populateSelectOptions() {
-    // Extract data from data attributes
-    const months = JSON.parse(document.getElementById('month').getAttribute('data-months'));
-    const years = JSON.parse(document.getElementById('year').getAttribute('data-years'));
-    const groups = JSON.parse(document.getElementById('group').getAttribute('data-groups'));
-    const subjects = JSON.parse(document.getElementById('subject').getAttribute('data-subjects'));
-
-    // Populate month dropdown
-    const monthSelect = document.getElementById('month');
-    months.forEach(month => {
-        const option = document.createElement('option');
-        option.value = month;
-        option.textContent = month;
-        monthSelect.appendChild(option);
-    });
-
-    // Populate year dropdown
-    const yearSelect = document.getElementById('year');
-    years.forEach(year => {
-        const option = document.createElement('option');
-        option.value = year;
-        option.textContent = year;
-        yearSelect.appendChild(option);
-    });
-
-    // Populate group dropdown
-    const groupSelect = document.getElementById('group');
-    groups.forEach(group => {
-        const option = document.createElement('option');
-        option.value = group;
-        option.textContent = group;
-        groupSelect.appendChild(option);
-    });
-
-    // Populate subject dropdown
-    const subjectSelect = document.getElementById('subject');
-    subjects.forEach(subject => {
-        const option = document.createElement('option');
-        option.value = subject;
-        option.textContent = subject;
-        subjectSelect.appendChild(option);
-    });
-}
-
-
-// Call populateSelectOptions function on page load
-populateSelectOptions();
-
-// Add event listener to the "Display" button
-const displayBtn = document.getElementById("display-btn");
-displayBtn.addEventListener('click', validateAndDisplay);
-
-// Add event listener to the "Edit" button
-const editBtn = document.getElementById("edit-btn");
-editBtn.addEventListener('click', editOrSave);
-
-</script>
+<script src="/js/client_journal.js"></script>
+{{!-- <script src="/js/client_subject.js"></script> --}}
+{{!-- <script src="/js/client_lessons.js"></script> --}}
+<script src="/js/client_grades.js"></script>
+</body>
+</html>

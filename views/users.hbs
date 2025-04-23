@@ -1,0 +1,51 @@
+<!--- users.hbs --->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Users</title>
+  <link rel="stylesheet" href="/css/users.css">
+</head>
+<body>
+  <div class="controls">
+    <input type="text" id="search" class="search-input" placeholder="Search user" value="{{searchQuery}}">
+    <select id="sort" class="sort-select">
+      {{#each roles}}
+        <option value="{{this}}" {{#if (eq ../selectedRole this)}}selected{{/if}}>{{this}}</option>
+      {{/each}}
+    </select>
+    <button onclick="performSearch()">Пошук</button>
+  </div>
+
+  <div id="users-container">
+    {{#if users.length}}
+      <div class="user-header">
+        <div class="header-item">Фото</div>
+        <div class="header-item">Ім'я</div>
+        <div class="header-item">Електронна пошта</div>
+        <div class="header-item">Роль</div>
+        <div class="header-item">Спеціальність</div>
+      </div>
+      {{#each users}}
+        <div class="user-item" onclick="window.location.href='/user_profile/{{user_id}}'">
+          <div class="user-photo" >
+            <img src="{{user_profile_image}}" alt="Profile Image" class="profile-img">
+          </div>
+          <div class="user-info">
+            <strong>{{name}} {{surname}} {{parent_name}}</strong>
+          </div>
+          <div class="user-email">{{email}}</div>
+          <div class="user-role">{{role}}</div>
+          <div class="user-specialization">{{#if (eq role "student")}}{{specialization}}{{else}}{{/if}}</div>
+        </div>
+      {{/each}}
+    {{else}}
+      <p>Нікого немає</p>
+    {{/if}}
+  </div>
+
+  <script src="/js/client_users.js"></script>
+</body>
+</html>
