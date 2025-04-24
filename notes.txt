@@ -70,3 +70,105 @@ groups:
 displays groups associated by teacher: subject group photo, group name, department associated by teacher
 filters: search bar by name, sort by a-z, z-a
 add subject group: 
+
+
+
+
+
+
+subjects page functionality:
+
+Client-Side Functionalities
+UI Components:
+
+Search input for filtering by subject name
+
+Sort dropdown (A-Z, Z-A)
+
+Group filter dropdown
+
+Add subject button
+
+Subject cards with dropdown menus
+
+Modal Management:
+
+Add Subject modal with form
+
+Edit Subject modal with form
+
+Delete confirmation modal
+
+Core Features:
+
+Subject filtering (search + group filter)
+
+Subject sorting (A-Z, Z-A)
+
+Image preview for uploads
+
+Dropdown menu handling
+
+Modal open/close logic
+
+Server Interactions:
+
+Fetch subject data for editing
+
+Submit new subject (POST)
+
+Update existing subject (PUT)
+
+Delete subject (DELETE)
+
+Server-Side Functionalities
+Routes:
+
+GET / - Render subjects page with all data
+
+GET /:id - Get single subject data
+
+POST /add - Add new subject
+
+PUT /:id - Update subject
+
+DELETE /:id - Delete subject
+
+Helper Functions:
+
+Get teacher ID from session
+
+Get teacher's subjects with department info
+
+Get teacher's assigned departments
+
+Get teacher's groups
+
+File Handling:
+
+Multer configuration for subject photo uploads
+
+File storage management
+
+Image path handling
+
+Issues to Address
+Client-Side:
+
+Redundant form submission handlers
+
+Inconsistent error handling
+
+Duplicate code for similar operations
+
+Overly complex DOM manipulation
+
+Server-Side:
+
+Basic multer configuration (should use MulterStorageManager)
+
+Incomplete validation
+
+No proper file cleanup on errors
+
+Inconsistent response formats

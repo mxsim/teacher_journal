@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // =======================
-  // DOM REFERENCES
-  // =======================
+  // DOM References
   const addModal = document.getElementById("add-subject-modal");
   const editModal = document.getElementById("edit-subject-modal");
   const deleteModal = document.getElementById("delete-subject-modal");
@@ -9,31 +7,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("search");
   const sortSelect = document.getElementById("sort");
   const groupFilter = document.getElementById("groupFilter");
-
-  // =======================
-  // UI INTERACTIONS
-  // =======================
-
-  // Dropdown toggle handler
+  const subjectsContainer = document.getElementById("subjects-container");
+  const filterForm = document.getElementById("filter-form");
+  
+  // Dropdown toggle logic
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".dropdown")) {
       document
         .querySelectorAll(".dropdown-menu")
         .forEach((menu) => (menu.style.display = "none"));
     }
-
     if (e.target.classList.contains("dots-btn")) {
       const dropdown = e.target.nextElementSibling;
-      const isVisible = dropdown.style.display === "block";
-      document
-        .querySelectorAll(".dropdown-menu")
-        .forEach((menu) => (menu.style.display = "none"));
-      dropdown.style.display = isVisible ? "none" : "block";
+      dropdown.style.display =
+        dropdown.style.display === "block" ? "none" : "block";
       e.stopPropagation();
     }
   });
 
-  // Modal open/close logic
+  // Modal open/close functions
   function openModal(modal) {
     modal.classList.add("show");
     document.body.style.overflow = "hidden";
@@ -44,15 +36,18 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.style.overflow = "";
     if (modal === addModal) {
       document.getElementById("add-subject-form").reset();
-      document.getElementById("add-image-preview").innerHTML = "";
+      document.getElementById("add-photo-preview").innerHTML = "";
     }
   }
 
-  addBtn.addEventListener("click", () => openModal(addModal));
+  if (addBtn) {
+    addBtn.addEventListener("click", () => openModal(addModal));
+  }
+
   document.querySelectorAll(".close-btn, .cancel-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) =>
-      closeModal(e.target.closest(".modal"))
-    );
+    btn.addEventListener("click", (e) => {
+      closeModal(e.target.closest(".modal"));
+    });
   });
 
   document.querySelectorAll(".modal").forEach((modal) => {
@@ -63,164 +58,161 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Image preview logic
   document
-    .getElementById("add-subject-image")
-    .addEventListener("change", handleImagePreview("add-image-preview"));
+    .getElementById("add-subject-photo")
+    ?.addEventListener("change", handleImagePreview("add-photo-preview"));
   document
-    .getElementById("edit-subject-image")
-    .addEventListener("change", handleImagePreview("edit-image-preview"));
+    .getElementById("edit-subject-photo")
+    ?.addEventListener("change", handleImagePreview("edit-photo-preview"));
 
   function handleImagePreview(previewId) {
     return function (e) {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function (e) {
+      reader.onload = function (evt) {
         document.getElementById(
           previewId
-        ).innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        ).innerHTML = `<img src="${evt.target.result}" alt="Preview">`;
       };
       reader.readAsDataURL(file);
     };
   }
 
-  // Search & filter logic
-  searchInput.addEventListener("input", filterSubjects);
-  sortSelect.addEventListener("change", filterSubjects);
-  groupFilter.addEventListener("change", filterSubjects);
 
-  function filterSubjects() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const sortOrder = sortSelect.value;
-    const selectedGroup = groupFilter.value;
 
-    const subjectCards = document.querySelectorAll(".subject-card");
-
-    subjectCards.forEach((card) => {
-      const name = card
-        .querySelector(".subject-name")
-        .textContent.toLowerCase();
-      const groups = card.dataset.groups ? card.dataset.groups.split(",") : [];
-      const matchesSearch = name.includes(searchTerm);
-      const matchesGroup = !selectedGroup || groups.includes(selectedGroup);
-      card.style.display = matchesSearch && matchesGroup ? "block" : "none";
-    });
-
-    const container = document.getElementById("subjects-container");
-    const visibleCards = [...subjectCards].filter(
-      (card) => card.style.display !== "none"
-    );
-
-    visibleCards.sort((a, b) => {
-      const nameA = a.querySelector(".subject-name").textContent.toLowerCase();
-      const nameB = b.querySelector(".subject-name").textContent.toLowerCase();
-      return sortOrder === "asc"
-        ? nameA.localeCompare(nameB)
-        : nameB.localeCompare(nameA);
-    });
-
-    visibleCards.forEach((card) => container.appendChild(card));
-  }
-
-  // =======================
-  // SERVER INTERACTIONS
-  // =======================
-
-  // Unified click listener for edit/delete buttons
+ 
+  // Event delegation for edit and delete buttons
   document.addEventListener("click", async (e) => {
     if (e.target.classList.contains("edit-btn")) handleEditClick(e);
     if (e.target.classList.contains("delete-btn")) handleDeleteClick(e);
   });
 
+  // Update the handleEditClick function in client_subjects.js
   async function handleEditClick(e) {
     const card = e.target.closest(".subject-card");
     const subjectId = card.dataset.id;
 
     try {
       const response = await fetch(`/subjects/${subjectId}`);
+      if (!response.ok) throw new Error("Failed to fetch subject");
+
       const subject = await response.json();
 
-      document.getElementById("edit-subject-id").value = subject.subject_id;
-      document.getElementById("edit-subject-name").value = subject.subject_name;
-      document.getElementById("edit-department").value = subject.department_id;
-      document.getElementById("edit-description").value =
-        subject.description || "";
+      // Ensure elements exist before setting values
+      const editSubjectId = document.getElementById("edit-subject-id");
+      const editSubjectName = document.getElementById("edit-subject-name");
+      const editDepartment = document.getElementById("edit-department");
+      const editCurrentPhoto = document.getElementById("edit-current-photo");
+      const preview = document.getElementById("edit-photo-preview");
 
-      const preview = document.getElementById("edit-image-preview");
+      if (
+        !editSubjectId ||
+        !editSubjectName ||
+        !editDepartment ||
+        !editCurrentPhoto ||
+        !preview
+      ) {
+        throw new Error("Required form elements not found");
+      }
+
+      editSubjectId.value = subject.subject_id;
+      editSubjectName.value = subject.subject_name;
+      editDepartment.value = subject.department_id;
+      editCurrentPhoto.value = subject.subject_photo || "";
+
       preview.innerHTML = subject.subject_photo
         ? `<img src="${subject.subject_photo}" alt="Current Image">`
         : "";
 
+
+        
+
+        // Prevent form submission when clicking add button
+        if (addBtn && filterForm) {
+          addBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            openModal(addModal);
+          });
+        }
+
       openModal(editModal);
     } catch (err) {
-      console.error("Error fetching subject:", err);
-      alert("Failed to load subject data.");
+      console.error("Error loading subject:", err);
+      alert("Failed to load subject data: " + err.message);
     }
   }
+
+  // Add this to initialize the filter form submission
+  document
+    .getElementById("filter-form")
+    ?.addEventListener("change", function () {
+      this.submit();
+    });
 
   function handleDeleteClick(e) {
     const card = e.target.closest(".subject-card");
     const subjectId = card.dataset.id;
     const subjectName = card.querySelector(".subject-name").textContent;
-
     document.getElementById("delete-subject-id").value = subjectId;
     document.getElementById("delete-subject-name").textContent = subjectName;
-
     openModal(deleteModal);
   }
 
+  // Form submission handlers
+  // Add Subject Form
   document
     .getElementById("add-subject-form")
-    .addEventListener("submit", handleFormSubmit("POST"));
-  document
-    .getElementById("edit-subject-form")
-    .addEventListener("submit", handleFormSubmit("PUT"));
-  document
-    .getElementById("delete-subject-form")
-    .addEventListener("submit", handleDeleteSubmit);
-
-  // Add Subject Form Submission
-  document
-    .getElementById("add-subject-form")
-    .addEventListener("submit", async (e) => {
+    ?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
-
       try {
         const response = await fetch("/subjects/add", {
           method: "POST",
           body: formData,
         });
-
+        const data = await response.json();
         if (response.ok) {
           window.location.reload();
+        } else {
+          alert(`Error: ${data.error}`);
         }
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error adding subject:", error);
+        alert("Failed to add subject. Check console for details.");
       }
     });
 
-  // Edit Subject Form Submission
+  // Edit Subject Form
   document
     .getElementById("edit-subject-form")
-    .addEventListener("submit", async (e) => {
+    ?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
       const subjectId = document.getElementById("edit-subject-id").value;
-
       try {
         const response = await fetch(`/subjects/${subjectId}`, {
           method: "PUT",
           body: formData,
         });
-
-        if (response.ok) {
-          window.location.reload();
-        }
+        if (response.ok) window.location.reload();
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error updating subject:", error);
       }
     });
 
-
-    
+  // Delete Subject Form
+  document
+    .getElementById("delete-subject-form")
+    ?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const subjectId = document.getElementById("delete-subject-id").value;
+      try {
+        const response = await fetch(`/subjects/${subjectId}`, {
+          method: "DELETE",
+        });
+        if (response.ok) window.location.reload();
+      } catch (error) {
+        console.error("Error deleting subject:", error);
+      }
+    });
 });

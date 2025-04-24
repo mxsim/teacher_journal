@@ -1,143 +1,155 @@
 <!-- subjects.hbs -->
 <div class="profile-container">
-    <div class="profile">
-        <div class="controls">
-            <input type="text" id="search" class="search-input" placeholder="Search by subject name">
-            <select id="sort" class="sort-select">
-                <option value="asc">Sort A-Z</option>
-                <option value="desc">Sort Z-A</option>
-            </select>
-            <select id="groupFilter" class="filter-select">
-            <option value="">Filter by Group</option>
-            {{#each groups}}
-                <option value="{{this}}">{{this}}</option>
-            {{/each}}
-            </select>
-            <button id="add-subject-btn" class="add-subject-btn">Add Subject</button>
-        </div>
+  <div class="profile">
+    <div class="controls">
+      <!-- Update the controls section in subjects.hbs -->
+<div class="controls">
+  <form id="filter-form" method="get" action="/subjects">
+    <input 
+      type="text" 
+      id="search" 
+      name="search" 
+      class="search-input" 
+      placeholder="Search by subject name"
+      value="{{currentSearch}}"
+    >
+    <select id="sort" name="sort" class="sort-select">
+      <option value="asc" {{#if (eq currentSort "asc")}}selected{{/if}}>Sort A-Z</option>
+      <option value="desc" {{#if (eq currentSort "desc")}}selected{{/if}}>Sort Z-A</option>
+    </select>
+    <select id="department" name="department" class="filter-select">
+      <option value="">All Departments</option>
+      {{#each departments}}
+        <option 
+          value="{{department_id}}" 
+          {{#if (eq ../currentDepartment department_id)}}selected{{/if}}
+        >
+          {{department_name}}
+        </option>
+      {{/each}}
+    </select>
+    <button type="submit" style="display:none">Apply Filters</button>
 
-        <div id="subjects-container">
-            {{#each subjects}}
-            <div class="subject-card" data-id="{{subject_id}}" data-groups="{{groups}}">
-    <div class="subject" onclick="window.location.href='/subject/{{subject_id}}'">
-        <div class="subject-image">
-            <img src="{{#if subject_photo}}{{subject_photo}}{{else}}/img/header.jpg{{/if}}"  alt="Subject Picture" class="subject-image" id="subj-img">
-        </div>
-        <div class="subject-info">
-            <div class="subject-name">{{subject_name}}</div>
-            <div class="department-name">{{department}}</div>
-            <p class="groups">{{groups}}</p>
-        </div>
+
+  </form>
+            {{#if isTeacher}}
+      <button id="add-subject-btn" class="add-subject-btn">Add Subject</button>
+      {{/if}}
+</div>
+      
+
     </div>
-    <div class="dropdown">
-        <button class="dots-btn">⋮</button>
-        <div class="dropdown-menu">
+
+    <div id="subjects-container">
+      {{#each subjects}}
+      <div class="subject-card" data-id="{{subject_id}}">
+        <div class="subject" onclick="window.location.href='/subject/{{subject_id}}'">
+          <div class="subject-image">
+            <img src="{{subject_photo}}" alt="Subject Image" class="subject-image">
+          </div>
+          <div class="subject-info">
+            <div class="subject-name">{{subject_name}}</div>
+            <div class="department-name">{{department_name}}</div>
+          </div>
+        </div>
+        <div class="dropdown">
+          <button class="dots-btn">⋮</button>
+          <div class="dropdown-menu">
             <button class="edit-btn">Edit</button>
             <button class="delete-btn">Delete</button>
+          </div>
         </div>
+      </div>
+      {{/each}}
     </div>
-</div>
-            {{/each}}
-        </div>
 
-        <!-- Add Subject Modal Form -->
-        <div id="add-subject-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn">&times;</span>
-                <h2>Add New Subject</h2>
-                <form id="add-subject-form" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="add-subject-name">Subject Name:</label>
-                        <input type="text" id="add-subject-name" name="subject-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="add-department">Department:</label>
-                        <select id="add-department" name="department" required>
-                            <option value="">Select Department</option>
-                            {{#each departments}}
-                                <option value="{{department_id}}">{{department_name}}</option>
-                            {{/each}}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="add-description">Description:</label>
-                        <textarea id="add-description" name="description" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="add-subject-image">Subject Image:</label>
-                        <input type="file" id="add-subject-image" name="subject_image" accept="image/*">
-                        <div id="add-image-preview" class="image-preview"></div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="cancel-btn">Cancel</button>
-                        <button type="submit" class="submit-btn">Add Subject</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Edit Subject Modal Form -->
-        <div id="edit-subject-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn">&times;</span>
-                <h2>Edit Subject</h2>
-                <form id="edit-subject-form" enctype="multipart/form-data">
-                    <input type="hidden" id="edit-subject-id" name="subject_id">
-                    <div class="form-group">
-                        <label for="edit-subject-name">Subject Name:</label>
-                        <input type="text" id="edit-subject-name" name="subject-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-department">Department:</label>
-                        <select id="edit-department" name="department" required>
-                            <option value="">Select Department</option>
-                            {{#each departments}}
-                                <option value="{{department_id}}">{{department_name}}</option>
-                            {{/each}}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-description">Description:</label>
-                        <textarea id="edit-description" name="description" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-subject-image">Subject Image:</label>
-                        <input type="file" id="edit-subject-image" name="subject_image" accept="image/*">
-                        <div id="edit-image-preview" class="image-preview">
-                            <img id="current-subject-image" src="" alt="Current Image">
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="cancel-btn">Cancel</button>
-                        <button type="submit" class="submit-btn">Update Subject</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-
-
-
-        <!-- Delete Confirmation Modal -->
-        <div id="delete-subject-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn">&times;</span>
-                <h2>Delete Subject</h2>
-                <form id="delete-subject-form">
-                    <input type="hidden" id="delete-subject-id" name="subject_id">
-                    <div class="form-group">
-                        <p>Are you sure you want to delete <strong id="delete-subject-name"></strong>?</p>
-                        <p class="warning-text">This action cannot be undone!</p>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="cancel-btn">Cancel</button>
-                        <button type="submit" class="delete-confirm-btn">Delete Subject</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-
-
+    <!-- Add Subject Modal -->
+    <div id="add-subject-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Add New Subject</h2>
+        <form id="add-subject-form" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="add-subject-name">Subject Name:</label>
+            <input type="text" id="add-subject-name" name="subject-name" required>
+          </div>
+          <div class="form-group">
+            <label for="add-department">Department:</label>
+            <select id="add-department" name="department" required>
+              <option value="">Select Department</option>
+              {{#each departments}}
+              <option value="{{department_id}}">{{department_name}}</option>
+              {{/each}}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="add-subject-photo">Subject Image:</label>
+            <input type="file" id="add-subject-photo" name="subject_photo" accept="image/*">
+            <div id="add-photo-preview" class="image-preview"></div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="submit-btn">Add Subject</button>
+          </div>
+        </form>
+      </div>
     </div>
+
+    <!-- Edit Subject Modal -->
+    <div id="edit-subject-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Edit Subject</h2>
+        <form id="edit-subject-form" enctype="multipart/form-data">
+          <input type="hidden" id="edit-subject-id" name="subject_id">
+          <div class="form-group">
+            <label for="edit-subject-name">Subject Name:</label>
+            <input type="text" id="edit-subject-name" name="subject-name" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-department">Department:</label>
+            <select id="edit-department" name="department" required>
+              <option value="">Select Department</option>
+              {{#each departments}}
+              <option value="{{department_id}}">{{department_name}}</option>
+              {{/each}}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-subject-photo">Subject Image:</label>
+            <input type="file" id="edit-subject-photo" name="subject_photo" accept="image/*">
+            <input type="hidden" id="edit-current-photo" name="current_photo">
+            <div id="edit-photo-preview" class="image-preview">
+              {{#if subject_photo}}
+                <img src="{{subject_photo}}" alt="Current Subject Image">
+              {{/if}}
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="submit-btn">Update Subject</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-subject-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Delete Subject</h2>
+        <form id="delete-subject-form">
+          <input type="hidden" id="delete-subject-id" name="subject_id">
+          <div class="form-group">
+            <p>Are you sure you want to delete <strong id="delete-subject-name"></strong>?</p>
+            <p class="warning-text">This action cannot be undone!</p>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="delete-confirm-btn">Delete Subject</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
