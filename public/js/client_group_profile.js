@@ -1,120 +1,200 @@
-// Пошук та сортування
-document.addEventListener("DOMContentLoaded", () => {
-  const searchInput = document.getElementById("studentSearch");
-  const sortSelect = document.getElementById("sortStudents");
-  const studentItems = document.querySelectorAll(".student-item");
+document.addEventListener("DOMContentLoaded", function () {
+  // 1. Modal toggle function
+  window.toggleModal = function (modalId, show = true) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.style.display = show ? "block" : "none";
+  };
 
-  searchInput.addEventListener("input", filterStudents);
-  sortSelect.addEventListener("change", sortStudents);
+  // 2. Debounce helper
+  const debounce = (func, delay = 300) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+  };
 
-  function filterStudents() {
-    const searchTerm = searchInput.value.toLowerCase();
+  // 3. Search functionality
+  // Speciality search
+  document.getElementById("specialitySearch")?.addEventListener(
+    "input",
+    debounce(async (e) => {
+      const query = e.target.value;
+      if (!query) {
+        document.getElementById("specialityResults").innerHTML = "";
+        return;
+      }
+      try {
+        const response = await fetch(
+          `/group/api/specialities/search?q=${encodeURIComponent(
+            query
+          )}&limit=5`
+        );
+        const specialities = await response.json();
 
-    studentItems.forEach((item) => {
-      const studentName = item
-        .querySelector(".student-info span")
-        .textContent.toLowerCase();
-      const speciality = item.dataset.speciality.toLowerCase();
+        const results = specialities
+          .map((spec) => {
+            const safeName = spec.speciality_name
+              .replace(/'/g, "\\'")
+              .replace(/"/g, '\\"');
+            return `<div class="search-item" data-id="${spec.speciality_id}" data-name="${safeName}">
+              ${spec.speciality_name}
+            </div>`;
+          })
+          .join("");
 
-      if (studentName.includes(searchTerm) || speciality.includes(searchTerm)) {
-        item.style.display = "grid";
-      } else {
-        item.style.display = "none";
+        document.getElementById("specialityResults").innerHTML = results;
+      } catch (error) {
+        console.error("Search error:", error);
+      }
+    })
+  );
+
+  // Student search
+  document.getElementById("studentSearch")?.addEventListener(
+    "input",
+    debounce(async (e) => {
+      const query = e.target.value;
+      const specialityId = document.getElementById("specialityId").value;
+      if (!query || !specialityId) return;
+      try {
+        const response = await fetch(
+          `/group/api/students/search?q=${encodeURIComponent(
+            query
+          )}&specialityId=${specialityId}&limit=5`
+        );
+        const students = await response.json();
+        const results = students
+          .map(
+            (student) =>
+              `<div class="search-item" data-id="${student.student_id}" data-name="${student.surname} ${student.name}">
+                ${student.surname} ${student.name} ${student.parent_name}
+              </div>`
+          )
+          .join("");
+        document.getElementById("studentResults").innerHTML = results;
+      } catch (error) {
+        console.error("Student search error:", error);
+      }
+    })
+  );
+
+  // 4. Event delegation for search results
+  document
+    .getElementById("specialityResults")
+    ?.addEventListener("click", (e) => {
+      const item = e.target.closest(".search-item");
+      if (item) {
+        selectSpeciality(item.dataset.id, item.dataset.name);
       }
     });
-  }
 
-  function sortStudents() {
-    const sortBy = sortSelect.value;
-    const container = document.querySelector(".students-list");
-    const items = Array.from(document.querySelectorAll(".student-item"));
+  document.getElementById("studentResults")?.addEventListener("click", (e) => {
+    const item = e.target.closest(".search-item");
+    if (item) {
+      selectStudent(item.dataset.id, item.dataset.name);
+    }
+  });
 
-    items.sort((a, b) => {
-      const nameA = a.querySelector(".student-info span").textContent;
-      const nameB = b.querySelector(".student-info span").textContent;
-      const specA = a.dataset.speciality;
-      const specB = b.dataset.speciality;
+  // 5. Delete functionality
+  document.addEventListener("click", function (e) {
+    // Delete button click
+    if (e.target.classList.contains("delete-btn")) {
+      e.preventDefault();
+      const form = e.target.closest("form");
+      const actionParts = form.action.split("/");
+      const groupId = actionParts[4];
+      const userId = actionParts[6];
 
-      switch (sortBy) {
-        case "asc":
-          return nameA.localeCompare(nameB);
-        case "desc":
-          return nameB.localeCompare(nameA);
-        case "speciality":
-          return specA.localeCompare(specB) || nameA.localeCompare(nameB);
-        default:
-          return 0;
+      document.getElementById("delete-group-id").value = groupId;
+      document.getElementById("delete-student-id").value = userId;
+      toggleModal("delete-student-modal");
+    }
+
+    // Add member form submission
+    if (
+      e.target.classList.contains("submit-btn") &&
+      e.target.form?.id === "addMemberForm"
+    ) {
+      e.preventDefault();
+      const form = e.target.form;
+      const studentId = document.getElementById("studentId").value;
+      const groupId = form.action.split("/")[4];
+
+      if (!studentId) {
+        alert("Будь ласка, виберіть студента");
+        return;
+      }
+
+      fetch(`/group/${groupId}/member/${studentId}/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => {
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            return response.json().then((err) => {
+              throw err;
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert(error.error || "Сталася помилка");
+        });
+    }
+  });
+
+  // Delete form submission
+  document
+    .getElementById("delete-student-form")
+    ?.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const groupId = formData.get("group_id");
+      const studentId = formData.get("student_id");
+
+      try {
+        const response = await fetch(
+          `/group/${groupId}/members/${studentId}/delete`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              _method: "DELETE",
+            }),
+          }
+        );
+
+        if (response.ok) {
+          window.location.reload();
+        } else {
+          alert("Помилка при видаленні студента");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Сталася помилка");
       }
     });
 
-    items.forEach((item) => container.appendChild(item));
-  }
+  // Selection handlers
+  window.selectSpeciality = (id, name) => {
+    document.getElementById("specialitySearch").value = name;
+    document.getElementById("specialityId").value = id;
+    document.getElementById("specialityResults").innerHTML = "";
+    document.getElementById("studentSearch").disabled = false;
+    document.getElementById("studentSearch").value = "";
+    document.getElementById("studentId").value = "";
+  };
+
+  window.selectStudent = (id, fullName) => {
+    document.getElementById("studentSearch").value = fullName;
+    document.getElementById("studentId").value = id;
+    document.getElementById("studentResults").innerHTML = "";
+  };
 });
-
-// Додавання/видалення студентів
-function toggleStudentSearch() {
-  const modal = document.getElementById("studentSearchModal");
-  modal.style.display = modal.style.display === "block" ? "none" : "block";
-}
-
-async function searchStudents() {
-  const query = document.getElementById("searchStudentInput").value;
-  if (query.length < 2) return;
-
-  try {
-    const response = await fetch(`/api/students/search?q=${query}`);
-    const results = await response.json();
-
-    const resultsContainer = document.getElementById("searchResults");
-    resultsContainer.innerHTML = "";
-
-    results.forEach((student) => {
-      const div = document.createElement("div");
-      div.className = "search-result-item";
-      div.innerHTML = `
-        <span>${student.surname} ${student.name} (${student.speciality_abbreviation})</span>
-        <button onclick="addStudent(${student.user_id})">Додати</button>
-      `;
-      resultsContainer.appendChild(div);
-    });
-  } catch (err) {
-    console.error("Search error:", err);
-  }
-}
-
-async function addStudent(studentId) {
-  const groupId = new URLSearchParams(window.location.search).get("id");
-
-  try {
-    const response = await fetch(`/group/${groupId}/add-student`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ studentId }),
-    });
-
-    if (response.ok) {
-      location.reload();
-    }
-  } catch (err) {
-    console.error("Add student error:", err);
-  }
-}
-
-async function removeStudent(groupId, studentId) {
-  if (!confirm("Ви впевнені, що хочете видалити студента з групи?")) return;
-
-  try {
-    const response = await fetch(
-      `/group/${groupId}/remove-student/${studentId}`,
-      {
-        method: "DELETE",
-      }
-    );
-
-    if (response.ok) {
-      location.reload();
-    }
-  } catch (err) {
-    console.error("Remove student error:", err);
-  }
-}

@@ -1,73 +1,126 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{group.group_name}} - Group Profile</title>
-  <link rel="stylesheet" href="/css/group_profile.css">
-</head>
-<body>
-  <div class="group-header" style="background-color: #4a6fa5;">
-    <h1>{{group.group_name}}</h1>
-    <div class="teacher-info">
-      <p>Викладач: {{group.teacher_name}} {{group.teacher_surname}}</p>
+<div class="profile-container">
+  <div class="profile">
+
+    <!-- Group Header -->
+<div class="group-header {{#if group.group_photo}}with-image{{else}}no-image{{/if}}">
+  <h1 class="group-name">{{group.group_name}}</h1>
+  <div class="teacher-info">
+    <img src="{{teacher.image}}" class="teacher-photo" alt="Teacher photo">
+    <div>
+      <p>Викладач: {{teacher.name}} {{teacher.surname}}</p>
+      <p>Предмет: {{group.subject_name}}</p>
     </div>
   </div>
+  {{#if group.group_photo}}
+    <img src="{{group.group_photo}}" alt="Group Photo" class="group-photo">
+  {{else}}
+    <p>No group photo available</p>
+  {{/if}}
+</div>
 
-  <div class="group-controls">
-    {{#if isOwner}}
-      <button class="add-student-btn" onclick="toggleStudentSearch()">+ Додати студента</button>
-    {{/if}}
-    
-    <div class="search-sort-container">
-      <input type="text" id="studentSearch" placeholder="Пошук студентів..." class="search-input">
-      <select id="sortStudents" class="sort-select">
-        <option value="asc">A-Z</option>
-        <option value="desc">Z-A</option>
-        <option value="speciality">За спеціальністю</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- Модальне вікно для пошуку студентів -->
-  <div id="studentSearchModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="toggleStudentSearch()">&times;</span>
-      <h3>Додати студента до групи</h3>
-      <input type="text" id="searchStudentInput" placeholder="Введіть ім'я або email">
-      <div id="searchResults" class="search-results"></div>
-    </div>
-  </div>
-
-  <div class="students-container">
-    <div class="students-header">
-      <div>ПІБ</div>
-      <div>Спеціальність</div>
-      {{#if isOwner}}<div>Дії</div>{{/if}}
-    </div>
-    
-    <div class="students-list">
-      {{#each students}}
-        <div class="student-item" data-speciality="{{this.speciality_abbreviation}}">
-          <div class="student-info">
-            <span>{{this.surname}} {{this.name}} {{this.parent_name}}</span>
-          </div>
-          <div class="student-speciality">
-            {{this.speciality_abbreviation}}
-          </div>
-          {{#if ../isOwner}}
-            <div class="student-actions">
-              <button class="remove-btn" 
-                      onclick="removeStudent({{../group.subject_group_id}}, {{this.user_id}})">
-                Видалити
-              </button>
-            </div>
-          {{/if}}
+    <!-- Group Leader -->
+    <div class="description-section">
+      <h2>Староста групи:</h2>
+      {{#if leader}}
+      <div class="leader-info">
+        <img src="{{leader.user_profile_image}}" class="leader-photo" onerror="this.src='/img/default-profile.png'">
+        <div class="leader-details">
+          <p>{{leader.surname}} {{leader.name}} {{leader.parent_name}}</p>
+          <p>{{leader.speciality_name}}</p>
         </div>
-      {{/each}}
+      </div>
+      {{else}}
+      <p>Староста не призначений.</p>
+      {{/if}}
+    </div>
+
+    <!-- Members List -->
+    <div class="description-section">
+      <div class="section-header">
+        <h2>Учасники групи ({{members.length}})</h2>
+        {{#if isOwner}}
+          <button class="add-material-btn" onclick="toggleModal('addMemberModal')">+ Додати студента</button>
+        {{/if}}
+      </div>
+
+      {{#if members.length}}
+      <div class="group-members">
+        <div class="member-header">
+          <div class="member-number">№</div>
+          <div class="member-photo-header">Фото</div>
+          <div class="member-name">ПІБ</div>
+          <div class="member-speciality">Спеціальність</div>
+          <div class="member-actions">Дії</div>
+        </div>
+        {{#each members}}
+        <div class="member-row {{#if is_leader}}leader{{/if}}">
+          <div class="member-number">{{this.position}}</div>
+          <div class="member-photo-cell">
+            <img src="{{this.user_profile_image}}" class="member-photo" onerror="this.src='/img/default-profile.png'">
+          </div>
+          <div class="member-name-cell" onclick="window.location.href='/user_profile/{{this.user_id}}'" style="cursor: pointer;">
+            {{this.surname}} {{this.name}} {{this.parent_name}}
+          </div>
+          <div class="member-speciality-cell">{{this.speciality_name}}</div>
+          <div class="member-actions-cell">
+            {{#if ../isOwner}}
+            <form action="/groups/{{../group.subject_group_id}}/members/{{this.user_id}}/delete" method="POST" style="display: inline;">
+              <button type="submit" class="delete-btn">Видалити</button>
+            </form>
+            {{/if}}
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+      <p class="no-materials">Немає студентів у групі.</p>
+      {{/if}}
+    </div>
+
+    <!-- Add Member Modal -->
+    <div id="addMemberModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <span class="close-btn" onclick="toggleModal('addMemberModal', false)">&times;</span>
+        <h2>Додати студента до групи</h2>
+          <form id="addMemberForm" action="/group/{{group.subject_group_id}}/member/{{this.user_id}}/add" method="POST">
+          <div class="form-group">
+            <label>Спеціальність:</label>
+            <input type="text" id="specialitySearch" placeholder="Пошук спеціальності...">
+            <div id="specialityResults" class="search-results"></div>
+            <input type="hidden" id="specialityId" name="speciality_id">
+          </div>
+          <div class="form-group">
+            <label>Студент:</label>
+            <input type="text" id="studentSearch" placeholder="Пошук студента..." disabled>
+            <div id="studentResults" class="search-results"></div>
+            <input type="hidden" id="studentId" name="student_id">
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" onclick="toggleModal('addMemberModal', false)">Скасувати</button>
+            <button type="submit" class="submit-btn">Додати</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Student Confirmation Modal -->
+    <div id="delete-student-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <span class="close-btn" onclick="toggleModal('delete-student-modal', false)">&times;</span>
+        <h2>Видалити студента</h2>
+        <form id="delete-student-form" method="POST">
+          <input type="hidden" id="delete-student-id" name="student_id">
+          <input type="hidden" id="delete-group-id" name="group_id">
+          <div class="form-group">
+            <p>Ви впевнені, що хочете видалити <strong id="delete-student-name"></strong> з групи?</p>
+            <p class="warning-text">Цю дію не можна скасувати!</p>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" onclick="toggleModal('delete-student-modal', false)">Скасувати</button>
+            <button type="submit" class="delete-confirm-btn">Видалити</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-
-  <script src="/js/client_group_profile.js"></script>
-</body>
-</html>
+</div>

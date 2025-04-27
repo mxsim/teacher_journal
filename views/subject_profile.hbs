@@ -1,116 +1,86 @@
-<!--- subject_profile.hbs --->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{subject.subject_name}} - Subject Profile</title>
-  <link rel="stylesheet" href="/css/subject_profile.css">
-  <style>
-    .subject-header {
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url('{{subject.subject_photo}}'),
-    url('/img/default-subject.jpg');
-    background-size: cover;
-    background-position: center;
-    height: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    position: relative;
-}
-  </style>
-</head>
-<body>
-  <div class="subject-header">
-    <h1>{{subject.subject_name}}</h1>
-    <div class="teacher-info">
-      <img src="{{teacher.image}}" class="teacher-photo" alt="Teacher photo">
-      <div>
-        <p>Викладач: {{teacher.name}} {{teacher.surname}}</p>
-      </div>
+{{!-- subject_profile.hbs --}}
+<div class="profile-container">
+  <div class="profile">
+<div class="subject-header {{#if subject.subject_photo}}with-image{{else}}no-image{{/if}}">
+  <h1 class="subject-name">{{subject.subject_name}}</h1>
+  <div class="teacher-info">
+    <img src="{{teacher.image}}" class="teacher-photo" alt="Teacher photo">
+    <div>
+      <p>Викладач: {{teacher.name}} {{teacher.surname}}</p>
+      <p>Кафедра: {{subject.department_name}}</p>
     </div>
   </div>
-
-  <!-- Add Description Editor -->
-  {{#if isOwner}}
-  <div class="description-editor">
-    <textarea id="subjectDescription" placeholder="Додайте опис предмету...">{{subject.description}}</textarea>
-    <button onclick="updateDescription()">Зберегти опис</button>
-  </div>
-  {{else}}
-  <div class="subject-description">
-    {{#if subject.description}}
-      {{subject.description}}
+    {{#if subject.subject_photo}}
+    <img src="{{subject.subject_photo}}" alt="Subject Icon" class="subject-photo">
     {{else}}
-      <em>Опис предмету відсутній</em>
+      <p>No subject photo available</p>
     {{/if}}
-  </div>
-  {{/if}}
+</div>
 
-  <!-- Modals (keep existing ones and add new) -->
-  <!-- Add Rename Material Modal -->
-  <div class="modal" id="renameMaterialModal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal('renameMaterialModal')">&times;</span>
-      <h3>Перейменувати матеріал</h3>
-      <form id="renameForm">
-        <input type="text" id="newFileName" required>
-        <button type="submit">Зберегти</button>
+    <!-- Description Section -->
+    {{#if isOwner}}
+    <div class="description-editor">
+      <form id="descriptionForm"
+            action="/subject/{{subject.subject_id}}/description"
+            method="POST">
+        <textarea id="subjectDescription"
+                  name="description"
+                  placeholder="Додайте опис предмету...">{{subject.description}}</textarea>
+        <button type="submit">Зберегти опис</button>
+        <div id="descriptionMessage" class="message"></div>
       </form>
     </div>
-  </div>
-
-  <!-- Add Group Management Modal -->
-  <div class="modal" id="manageGroupModal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal('manageGroupModal')">&times;</span>
-      <h3>Керування групами</h3>
-      <select id="availableGroups">
-        <!-- Options will be populated by JS -->
-      </select>
-      <button onclick="addGroupToSubject()">Додати групу</button>
+    {{else}}
+    <div class="subject-description">
+      {{#if subject.description}}
+        {{{subject.description}}}
+      {{else}}
+        <em>Опис предмету відсутній</em>
+      {{/if}}
     </div>
-  </div>
+    {{/if}}
 
-  <div class="nav-buttons">
-    <button class="nav-button active" data-target="main-content">Main</button>
-    <button class="nav-button" data-target="groups-content">Groups</button>
+    <!-- Tabs -->
+    <div class="nav-buttons">
+      <button class="nav-button active" data-target="main-content">Матеріали</button>
+      <button class="nav-button" data-target="groups-content">Групи</button>
+    </div>
 
-  </div>
+    <!-- Materials -->
+    <div id="main-content" class="content-section active">
+      {{#if isOwner}}
+        <button class="add-btn" onclick="toggleModal('addMaterialModal')">
+          + Додати матеріал
+        </button>
+      {{/if}}
 
-  <!-- Main Content -->
-  <div id="main-content" class="content-section active">
-    {{#if isOwner}}
-            <button class="add-material-btn" onclick="toggleModal('addMaterialModal')">+ Додати матеріал</button>
-        {{/if}}
-    {{#each materialsByType}}
-        
+      {{#each materialsByType}}
       <div class="foldable-section">
         <div class="section-header" onclick="toggleSection('{{@key}}')">
           <h2>{{@key}} ({{this.length}})</h2>
           <span class="toggle-icon">▼</span>
         </div>
-        
         <div class="section-content" id="{{@key}}-content">
           {{#if this.length}}
             {{#each this}}
               <div class="material-item">
-                <div class="material-info" onclick="window.open('{{this.file_path}}', '_blank')">
-                  <img src="/img/icons/{{this.material_type}}.png" class="material-icon" alt="{{this.material_type}}">
+                <div class="material-info"
+                     onclick="window.open('{{this.file_path}}','_blank')">
+                  <img src="/img/icons/{{this.material_type}}.png"
+                       class="material-icon" alt="{{this.material_type}}">
                   <span>{{this.file_name}}</span>
                 </div>
-                {{#if ../isOwner}}
+                {{#if ../../isOwner}}
                 <div class="material-actions">
-                  <button class="rename-btn" onclick="showRenameModal({{this.id}}, '{{this.file_name}}')">
-                    Перейменувати
-                  </button>
-                  <button class="delete-btn" onclick="confirmDeleteMaterial({{this.id}})">
-                    Видалити
-                  </button>
-                </div>
+              <button class="edit-btn"
+                      onclick="showEditMaterialModal({{this.id}}, '{{this.file_name}}', '{{this.material_type}}')">
+                ✎
+              </button>
+              <button class="delete-btn"
+                      onclick="confirmDeleteMaterial({{this.id}}, '{{this.file_name}}')">
+                🗑
+              </button>
+            </div>
                 {{/if}}
               </div>
             {{/each}}
@@ -119,51 +89,143 @@
           {{/if}}
         </div>
       </div>
-    {{/each}}
-  </div>
+      {{/each}}
+    </div>
 
-  <!-- Groups Content -->
-  <div id="groups-content" class="content-section">
-        {{#if isOwner}}
-            <button class="manage-groups-btn" onclick="addGroups()">+ Додати групу</button>
-        {{/if}}
-
-    {{#each groups}}
+    <!-- Groups -->
+    <div id="groups-content" class="content-section">
+      {{#each groups}}
       <div class="foldable-section">
         <div class="group-header">
           <h2>{{this.group_name}}</h2>
           {{#if ../isOwner}}
-            <button class="delete-group-btn" onclick="confirmDeleteGroup({{this.subject_group_id}})">
+            <button class="delete-btn"
+                    onclick="confirmDeleteGroup({{this.subject_group_id}}, '{{this.group_name}}')">
               Видалити групу
             </button>
           {{/if}}
         </div>
-        
         <div class="group-members">
           <div class="member-header">
-            <div>Фото</div>
-            <div>ПІБ</div>
-            <div>Спеціальність</div>
-            <div>Роль</div>
+            <div>Фото</div><div>ПІБ</div><div>Спеціальність</div><div>Роль</div>
           </div>
           {{#each this.members}}
-            <div class="member-row" onclick="window.location.href='/user_profile/{{this.user_id}}'">
-              <img src="{{#if this.user_profile_image}}
-                  /uploads/users/profile_data/{{this.user_profile_image}}
-                {{else}}
-                  /img/default-profile.png
-                {{/if}}" 
-                class="member-photo">
-              <div>{{this.surname}} {{this.name}} {{this.parent_name}}</div>
-              <div>{{this.speciality_name}}</div>
-              <div>{{this.role}}</div>
-            </div>
+          <div class="member-row"
+               onclick="window.location.href='/user_profile/{{this.user_id}}'">
+            <img src="{{this.user_profile_image}}" class="member-photo">
+            <div>{{this.surname}} {{this.name}} {{this.parent_name}}</div>
+            <div>{{this.speciality_name}}</div>
+            <div>{{this.role}}</div>
+          </div>
           {{/each}}
         </div>
       </div>
-    {{/each}}
-  </div>
+      {{/each}}
+    </div>
 
-  <script src="/js/client_subject_profile.js"></script>
-</body>
-</html>
+    <!-- Add Material Modal -->
+    <div id="addMaterialModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('addMaterialModal')">&times;</span>
+        <h2>Додати новий матеріал</h2>
+        <form id="addMaterialForm"
+              action="/subject/{{subject.subject_id}}/materials"
+              method="POST"
+              enctype="multipart/form-data">
+          <div class="form-group">
+            <label>Назва матеріалу:</label>
+            <input type="text" name="file_name" required>
+          </div>
+          <div class="form-group">
+            <label>Тип матеріалу:</label>
+            <select name="material_type" required>
+              <option value="lecture">Лекція</option>
+              <option value="task">Завдання</option>
+              <option value="additional">Додатковий матеріал</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Файл:</label>
+            <input type="file" name="material" required>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn"
+                    onclick="closeModal('addMaterialModal')">Скасувати</button>
+            <button type="submit" class="submit-btn">Додати</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Material Modal -->
+    <div id="editMaterialModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('editMaterialModal')">&times;</span>
+        <h2>Редагувати матеріал</h2>
+        <form id="editMaterialForm"
+              action=""
+              method="POST">
+          <input type="hidden" name="_method" value="POST">
+          <div class="form-group">
+            <label>Назва матеріалу:</label>
+            <input type="text" id="edit-file-name" name="file_name" required>
+          </div>
+          <div class="form-group">
+            <label>Тип матеріалу:</label>
+            <select id="edit-material-type" name="material_type" required>
+              <option value="lecture">Лекція</option>
+              <option value="task">Завдання</option>
+              <option value="additional">Додатковий матеріал</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn"
+                    onclick="closeModal('editMaterialModal')">Скасувати</button>
+            <button type="submit" class="submit-btn">Зберегти</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Material Modal -->
+    <div id="deleteMaterialModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('deleteMaterialModal')">&times;</span>
+        <h2>Підтвердити видалення</h2>
+        <form id="deleteMaterialForm"
+              action=""
+              method="POST">
+          <div class="form-group">
+            <p>Видалити матеріал <strong id="delete-material-name"></strong>?</p>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn"
+                    onclick="closeModal('deleteMaterialModal')">Скасувати</button>
+            <button type="submit" class="delete-confirm-btn">Видалити</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Group Modal -->
+    <div id="deleteGroupModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('deleteGroupModal')">&times;</span>
+        <h2>Підтвердити видалення</h2>
+        <form id="deleteGroupForm"
+              action=""
+              method="POST">
+          <div class="form-group">
+            <p>Видалити групу <strong id="delete-group-name"></strong>?</p>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn"
+                    onclick="closeModal('deleteGroupModal')">Скасувати</button>
+            <button type="submit" class="delete-confirm-btn">Видалити</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>

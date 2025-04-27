@@ -217,9 +217,9 @@ INSERT INTO subjects (subject_name, teacher_id, department_id, description) VALU
 -- Insert records into the subject_groups table
 -- Note: Only one insert block that provides teacher_id is used.
 INSERT INTO subject_groups (subject_id, group_name, subject_group_photo, teacher_id) VALUES
-(1, 'Група КП-Н21', 'photos/group_kp.jpg', 1),
-(1, 'Група B-2', 'photos/group_b2.jpg', 1),
-(2, 'Група Ф', 'photos/physics_group.jpg', 2);
+(1, 'Група КП-Н21', 'group_kp.jpg', 1),
+(1, 'Група B-2', 'group_b2.jpg', 1),
+(2, 'Група Ф', 'physics_group.jpg', 2);
 
 -- Insert records into the collaborative_groups table
 INSERT INTO collaborative_groups (subject_group_id, student_id) VALUES
@@ -259,5 +259,5 @@ INSERT INTO journal (entry_id, student_id, lesson_id, grade) VALUES
 -- Insert records into the subject_materials table
 INSERT INTO subject_materials (subject_id, file_name, file_path, material_type) VALUES
 (1, 'algebra.pdf', 'material_algebra.pdf', 'lecture'),
-(1, 'geometry.pdf', '/materials/math/geometry.pdf', 'lecture'),
-(2, 'mechanics.pdf', '/materials/physics/mechanics.pdf', 'task');
+(1, 'geometry.pdf', 'material_geometry.pdf', 'lecture'),
+(2, 'mechanics.pdf', 'material_mechanics.pdf', 'task');

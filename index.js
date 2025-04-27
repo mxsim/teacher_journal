@@ -74,7 +74,7 @@ app.use('/grades', gradesRouter);
 app.use("/journal", journalRouter);
 
 // app.use("/groups", groupsRouter);
-app.use("/group_profile", groupProfileRouter);
+app.use("/group", groupProfileRouter);
 app.use("/groups", groupsRouter);
 
 app.use("/subjects", subjectsRouter);

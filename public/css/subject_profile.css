@@ -110,7 +110,32 @@
     cursor: pointer;
 }
 
+.subject-header {
+    background-size: cover;
+    background-position: center;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: relative;
+}
 
+.subject-name {
+    font-weight: bold;
+    z-index: 1;
+}
+
+.subject-photo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
 
 .subject-description {
     font-style: italic;
@@ -126,10 +151,12 @@
 }
 
 .teacher-info {
+        font-weight: bold;
     display: flex;
     align-items: center;
     gap: 15px;
     margin-top: 20px;
+    z-index: 1;
 }
 
 .teacher-photo {
@@ -137,6 +164,7 @@
     height: 50px;
     border-radius: 50%;
     object-fit: cover;
+    z-index: 1;
 }
 
 

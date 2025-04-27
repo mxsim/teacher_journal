@@ -23,6 +23,18 @@ class MulterStorageManager {
       allowedMimeTypes: ["image/jpeg", "image/png", "image/gif"],
     });
 
+    // Group Photos
+    this.registerStorage("groupPhotos", {
+      subPath: "group/group_photos",
+      filenameGenerator: (req, file) => {
+        const ext = path.extname(file.originalname);
+        return req.params.id
+          ? `group_${req.params.id}${ext}`
+          : `temp_group_${Date.now()}${ext}`;
+      },
+      allowedMimeTypes: ["image/jpeg", "image/png", "image/gif"],
+    });
+
     // Subject Material Files
     this.registerStorage("subjectMaterialFiles", {
       subPath: "subjects/material_files",

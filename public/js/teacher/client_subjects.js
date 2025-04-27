@@ -1,3 +1,4 @@
+// client_subjects.js
 document.addEventListener("DOMContentLoaded", () => {
   // DOM References
   const addModal = document.getElementById("add-subject-modal");
